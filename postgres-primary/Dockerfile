@@ -1,12 +1,8 @@
 FROM postgres:alpine
-
-VOLUME /db/wal
-
-USER 0
-
-ENV POSTGRES_INITDB_WALDIR=/db/wal
-
-COPY ./primary.conf /etc/postgresql/postgresql.conf 
-
-USER postgres
-CMD [ "postgres -c config-file=/etc/postgresql/postgresql.conf" ]
+VOLUME [ "/db/wal" ]
+COPY ./primary.conf /etc/postgresql/postgresql.conf
+RUN mkdir -p /db/wal/
+RUN mkdir -p /db/wal/archives/
+RUN chown -R postgres:postgres /db/wal
+RUN chown -R postgres:postgres /etc/postgresql/postgresql.conf
+CMD [ "postgres", "-c", "config-file=/etc/postgresql/postgresql.conf" ] 
