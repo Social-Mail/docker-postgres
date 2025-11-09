@@ -1,0 +1,15 @@
+services:
+  primary-postgres:
+    container_name: primary-postgres
+    build:
+      context: .
+    environment:
+      - POSTGRES_PASSWORD=abcd123
+    volumes:
+      - db-wal:/db/wal
+    ports:
+      - 5432:5432
+
+volumes:
+  db-wal:
+    external: false
