@@ -10,6 +10,15 @@ services:
     ports:
       - 5432:5432
 
+  primary-postgres-backup:
+    container_name: primary-postgres-backup
+    build:
+      context: ../pg-backup
+    environment:
+      - POSTGRES_PASSWORD=abcd123
+    volumes:
+      - db-wal:/db/wal
+
 volumes:
   db-wal:
     external: false

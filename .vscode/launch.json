@@ -1,0 +1,155 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Dev Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeArgs": [
+                "--enable-source-maps"
+            ],
+            "program": "${workspaceFolder}/dev.js",
+            "env": {
+                "SOCIAL_MAIL_AUTH_COOKIE_SECURE": "false",
+                "SOCIAL_MAIL_AUTH_COOKIE": "sm-ta1",
+                "SOCIAL_MAIL_AUTH_SHARE_COOKIE": "sm-sta1",
+                "SOCIAL_MAIL_AV": "null",
+                "SOCIAL_MAIL_DB_SSL": "null",
+                "SOCIAL_MAIL_TMP_PATH": "d:/temp/t1",
+                "SOCIAL_MAIL_TEST": "true",
+                "PORT": "9090"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/test.js",
+            "env": {
+                "SOCIAL_MAIL_AUTH_COOKIE_SECURE": "false",
+                "SOCIAL_MAIL_AUTH_COOKIE": "sm-ta1",
+                "SOCIAL_MAIL_AUTH_SHARE_COOKIE": "sm-sta1",
+                "SOCIAL_MAIL_DB_SSL": "null",
+                "SOCIAL_MAIL_AV": "null",
+                "SOCIAL_MAIL_SECRET_KEY": "abcd123",
+                "PORT": "9090"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test Selected File",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeArgs": [
+                "--enable-source-maps"
+            ],
+            "program": "${workspaceFolder}/test.js",
+            "env": {
+                "SOCIAL_MAIL_AUTH_COOKIE_SECURE": "false",
+                "SOCIAL_MAIL_AUTH_COOKIE": "sm-ta1",
+                "SOCIAL_MAIL_AUTH_SHARE_COOKIE": "sm-sta1",
+                "SOCIAL_MAIL_DB_SSL": "null",
+                "SOCIAL_MAIL_AV": "null",
+                "SOCIAL_MAIL_TEST": "true",
+                "SOCIAL_MAIL_SECRET_KEY": "abcd123",
+                "PORT": "9090"
+            },
+            "args": [
+                "--test-file",
+                "${file}"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run Selected File",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${file}",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test Imap",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/imap-tester.js",
+            "env": {
+                "SOCIAL_MAIL_AUTH_COOKIE_SECURE": "false",
+                "SOCIAL_MAIL_AUTH_COOKIE": "sm-ta1",
+                "SOCIAL_MAIL_AUTH_SHARE_COOKIE": "sm-sta1",
+                "SOCIAL_MAIL_DB_SSL": "null",
+                "SOCIAL_MAIL_AV": "null",
+                "SOCIAL_MAIL_SECRET_KEY": "abcd123",
+                "PORT": "9090"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Cluster Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/index.js",
+            "env": {
+                "SOCIAL_MAIL_HOST": "socialmail.in",
+                "SOCIAL_MAIL_AUTH_COOKIE": "sm-ta1",
+                "SOCIAL_MAIL_AUTH_SHARE_COOKIE": "sm-sta1",
+                "SOCIAL_MAIL_AV": "null",
+                "SOCIAL_MAIL_SSL_MODE": "self-signed",
+                "SOCIAL_MAIL_SSL_LE_EMAIL": "somewhere@somebody.com",
+                "SOCIAL_MAIL_AUTH_COOKIE_SECURE": "true",
+                "SOCIAL_MAIL_SECRET_KEY": "abcd123",
+                "SOCIAL_MAIL_DB_SSL": "null",
+                "SOCIAL_MAIL_CLUSTER_WORKERS": "2",
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        },
+        {
+            "name": "Attach to Process",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": "/app/",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js",
+                "${workspaceFolder}/node_modules/@entity-access/**/*.js",
+            ]
+        }
+    ]
+}
