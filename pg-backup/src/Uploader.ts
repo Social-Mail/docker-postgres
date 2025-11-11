@@ -33,9 +33,22 @@ export class Uploader {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            const tempBackupFolder = this.backupFolder + "." + Date();
+            const tempBackupFolder = this.backupFolder + "." + Date.now();
 
-            const { status } = await spawnPromise("pg_basebackup", ["-D", tempBackupFolder, "-f t", "-R"]);
+            console.log(`Taking full backup at ${tempBackupFolder}`);
+
+            const { status } = await spawnPromise(
+                "/usr/bin/pg_basebackup", [
+                    "-h", globalEnv.source.socket ,
+                    "-D", tempBackupFolder,
+                    "-U", globalEnv.source.user,
+                    "-w",
+                    "-F", "t",
+                    "-R"], {
+                        env: {
+                            PGPASSWORD: globalEnv.source.password
+                        }
+                    });
 
             if (status) {
                 throw new Error("backup failed");
@@ -43,6 +56,8 @@ export class Uploader {
             // after success
             await spawnPromise("mv", [tempBackupFolder, this.backupFolder]);
         }
+
+        console.log(`Full backup exists at ${this.backupFolder}`);
 
     }
 

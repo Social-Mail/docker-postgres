@@ -7,7 +7,7 @@ const interval = oneMinute * 15;
 (async function() {
 for(;;) {
 
-    const [folder, time] = (new Date()).toJSON().replaceAll(":", "-").replace("T", "/");
+    const [folder, time] = (new Date()).toJSON().replaceAll(":", "-").replace("T", "/").split("/");
 
     const uploader = new Uploader(folder, time);
     await uploader.upload();
