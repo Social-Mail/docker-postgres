@@ -5,13 +5,23 @@ const oneMinute = 60*60*1000;
 const interval = oneMinute * 15;
 
 (async function() {
-for(;;) {
 
-    const [folder, time] = (new Date()).toJSON().replaceAll(":", "-").replace("T", "/").split("/");
+    await promises.setTimeout(5*1000);
 
-    const uploader = new Uploader(folder, time);
-    await uploader.upload();
-    await promises.setTimeout(interval);
+    for(;;) {
 
-}
+        try {
+            const [folder, time] = (new Date()).toJSON().replaceAll(":", "-").replace("T", "/").split("/");
+
+            const uploader = new Uploader(folder, time);
+            await uploader.upload();
+        } catch (error) {
+            console.error(error);
+            await promises.setTimeout(15*1000);
+            continue;
+        }
+        await promises.setTimeout(interval);
+        
+
+    }
 })().catch(console.error);

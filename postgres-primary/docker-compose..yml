@@ -1,6 +1,7 @@
 services:
   primary-postgres:
     container_name: primary-postgres
+    restart: always
     build:
       context: .
     environment:
@@ -13,10 +14,13 @@ services:
 
   primary-postgres-backup:
     container_name: primary-postgres-backup
+    restart: always
     build:
       context: ../pg-backup
     environment:
       - POSTGRES_PASSWORD=abcd123
+    depends_on:
+      - primary-postgres
     volumes:
       - db-wal:/db/wal
       - db-socket:/var/run/postgresql
