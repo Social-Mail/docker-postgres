@@ -26,6 +26,7 @@
         "bigserial",
         "bytea",
         "Certbot",
+        "certonly",
         "clamav",
         "clamd",
         "clamdscan",

@@ -41,6 +41,15 @@ services:
       - test-db-socket:/var/run/postgresql
       - test-backup-cache:/cache
 
+  certbot:
+    container_name: test-pg-cert-bot
+    image: certbot/dns-route53
+    command: ["certonly", "--dry-run"]
+    environment:
+      - AWS_CONFIG_FILE=/var/aws/credentials
+    volumes:
+      - ./test.env: /var/aws/credentials
+
 volumes:
   test-db-wal:
     external: false
