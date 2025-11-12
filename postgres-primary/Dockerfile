@@ -13,6 +13,5 @@ RUN chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 
 WORKDIR /app
 COPY ./entrypoint.sh ./
-COPY ./pg_hba.conf ./
 ENTRYPOINT [ "/app/entrypoint.sh" ]
 CMD [ "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
