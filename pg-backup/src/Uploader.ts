@@ -23,6 +23,9 @@ export class Uploader {
 
         await this.takeBackup(this.timeFolder, true);
 
+        // upload all files...
+        await this.storage.sync({ cloudPath: this.folder, localPath: this.backupFolder });
+
     }
 
     async takeBackup(folder: string, diff = false) {
@@ -51,7 +54,8 @@ export class Uploader {
 
                 // find last backup_manifest...
                 let lastDir = this.backupFolder;
-                for await (const dir of await opendir(this.backupFolder)) {
+                using ds = await opendir(this.backupFolder);
+                for await (const dir of ds) {
                     if(dir.isDirectory()) {
                         lastDir = join(dir.parentPath, dir.name);
                     }

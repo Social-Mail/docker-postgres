@@ -5,16 +5,20 @@ import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand } from 
 import { Readable } from "node:stream";
 import Hash from "./Hash.js";
 import { createReadStream } from "node:fs";
+import { join } from "node:path";
 
 export default class S3Storage extends BaseStorage {
 
     client: S3Client;
     bucket: string;
+    prefix: string;
+    folder: string;
 
     constructor() {
         super();
-        const { endpoint, accessKeyId, secretAccessKey, region, bucket } = globalEnv.storage.s3;
+        const { endpoint, accessKeyId, secretAccessKey, region, bucket, folder } = globalEnv.storage.s3;
         this.bucket = bucket;
+        this.folder = folder;
         this.client = new S3Client({
             endpoint,
             credentials: {
@@ -26,34 +30,43 @@ export default class S3Storage extends BaseStorage {
         });
     }
 
-    async download({ uploadPath, localFile }): Promise<void> {
+    async download({ cloudPath, localPath }): Promise<void> {
+        const Key = join(this.folder, cloudPath);
         const r = await this.client.send(new GetObjectCommand({
             Bucket: this.bucket,
-            Key: uploadPath
+            Key
         }));
-        await writeFile(localFile, r.Body as Readable);
+        await writeFile(localPath, r.Body as Readable);
     }
 
-    async upload({ uploadPath, localFile }) {
-        const ChecksumSHA256 = await Hash.hash(localFile);
+    async upload({ cloudPath, localPath }) {
+        const Key = join(this.folder, cloudPath);
+        const ChecksumSHA256 = await Hash.hash(localPath);
+
+        console.log(`Uploading ${localPath} to ${cloudPath}`);
 
         await this.client.send(new PutObjectCommand({
             Bucket: this.bucket,
-            Key: uploadPath,
+            Key,
             ChecksumSHA256,
-            Body: createReadStream(localFile)
+            Body: createReadStream(localPath)
         }));
     }
 
-    async exists({ uploadPath }) {
+    async exists(cloudPath, hash: string) {
+      const Key = join(this.folder, cloudPath);
       const command = new HeadObjectCommand({
         Bucket: this.bucket,
-        Key: uploadPath,
+        ChecksumMode:"ENABLED",
+        Key,
       });
 
       try {
-        await this.client.send(command);
-        return true; // File exists
+        const result = await this.client.send(command);
+        if(result.ChecksumSHA256 === hash) {
+          return true; // File exists
+        }
+        return false;
       } catch (error) {
         if (error.name === 'NotFound') {
           return false; // File does not exist

@@ -1,9 +1,10 @@
+name: postgres-production-primary
 services:
   primary-postgres:
     container_name: primary-postgres
     restart: always
     build:
-      context: .
+      context: ../postgres-primary
     environment:
       - POSTGRES_PASSWORD=abcd123
     volumes:

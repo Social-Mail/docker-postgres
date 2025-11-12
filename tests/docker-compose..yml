@@ -1,0 +1,52 @@
+name: postgres-test-primary
+services:
+  primary-postgres:
+    container_name: test-primary-postgres
+    restart: always
+    build:
+      context: ../postgres-primary
+    environment:
+      - POSTGRES_PASSWORD=abcd123
+    volumes:
+      - test-db-wal:/db/wal
+      - test-db-socket:/var/run/postgresql
+    ports:
+      - 5432:5432
+
+  s3mock:
+    image: adobe/s3mock:latest
+    container_name: s3mock
+    environment:
+      - COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=bucket1
+      - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
+      - debug=true
+    ports:
+      - 9090:9090
+
+  primary-postgres-backup:
+    container_name: test-primary-postgres-backup
+    restart: always
+    build:
+      context: ../pg-backup
+    environment:
+      - POSTGRES_PASSWORD=abcd123
+      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
+      - PG_BACKUP_STORAGE_S3_BUCKET=bucket1
+      - PG_BACKUP_STORAGE_S3_ACCESS_KEY_ID=foo
+      - PG_BACKUP_STORAGE_S3_SECRET=bar
+    depends_on:
+      - primary-postgres
+    volumes:
+      - test-db-wal:/db/wal
+      - test-db-socket:/var/run/postgresql
+      - test-backup-cache:/cache
+
+volumes:
+  test-db-wal:
+    external: false
+  test-db-socket:
+    external: false
+  test-backup-cache:
+    external: false
+  localstack-data:
+    external: false

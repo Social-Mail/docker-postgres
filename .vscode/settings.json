@@ -1,15 +1,13 @@
 {
     "terminal.integrated.profiles.windows": {
-        "PowerShell": {
-            "source": "PowerShell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass"
-            ]
-        }
-   },
-   "terminal.integrated.defaultProfile.windows": "PowerShell",
-   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "PowerShell": {
+        "source": "PowerShell",
+        "icon": "terminal-powershell",
+        "args": ["-ExecutionPolicy", "Bypass"]
+    }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
 	"eslint.format.enable": true,
 	"emmet.showSuggestionsAsSnippets": false,
 	"emmet.showAbbreviationSuggestions": false,
@@ -50,6 +48,7 @@
         "letsencrypt",
         "libvorbis",
         "libvpx",
+        "localstack",
         "mailauth",
         "mailparser",
         "Millis",
