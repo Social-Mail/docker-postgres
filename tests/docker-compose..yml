@@ -44,11 +44,12 @@ services:
   certbot:
     container_name: test-pg-cert-bot
     image: certbot/dns-route53
-    command: ["certonly", "--dry-run"]
+    command: ["certonly", "--dry-run", "--cert-name", "local-db.socialmail.in", "-d", "local-db.socialmail.in"]
     environment:
       - AWS_CONFIG_FILE=/var/aws/credentials
     volumes:
       - ./test.env: /var/aws/credentials
+      - certs: /etc/letsencrypt
 
 volumes:
   test-db-wal:
@@ -59,3 +60,5 @@ volumes:
     external: false
   localstack-data:
     external: false
+  certs:
+    external: false    
