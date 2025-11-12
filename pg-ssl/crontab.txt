@@ -1,2 +1,2 @@
 # Run a script every minute
-01 01 */5 * * root /usr/local/bin/script.sh >> /var/log/cron.log 2>&1
+01 01 */5 * * root /app/script.sh >> /var/log/cron.log 2>&1
