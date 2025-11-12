@@ -2,7 +2,6 @@
 
 certbot \
     certonly \
-    --staging \
     --cert-name \
     $CERT_NAME \
     -d \

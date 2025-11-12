@@ -7,9 +7,12 @@ services:
       context: ../postgres-primary
     environment:
       - POSTGRES_PASSWORD=abcd123
+      - SSL_CERT_FILE=/etc/letsencrypt/live/local-db.socialmail.in/fullchain.pem
+      - SSL_KEY_FILE=/etc/letsencrypt/live/local-db.socialmail.in/privkey.pem
     volumes:
       - test-db-wal:/db/wal
       - test-db-socket:/var/run/postgresql
+      - certs:/etc/letsencrypt
     ports:
       - 5432:5432
 
