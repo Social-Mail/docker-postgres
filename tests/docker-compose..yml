@@ -7,6 +7,7 @@ services:
       context: ../postgres-primary
     environment:
       - POSTGRES_PASSWORD=abcd123
+      - PG_REPLICATOR_PASSWORD=replicatorPassword
       - SSL_CERT_FILE=/etc/letsencrypt/live/local-db.socialmail.in/fullchain.pem
       - SSL_KEY_FILE=/etc/letsencrypt/live/local-db.socialmail.in/privkey.pem
     volumes:
