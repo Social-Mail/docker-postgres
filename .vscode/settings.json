@@ -31,6 +31,8 @@
         "clamd",
         "clamdscan",
         "clamscan",
+        "crond",
+        "crontabs",
         "dataurls",
         "datname",
         "dmarc",

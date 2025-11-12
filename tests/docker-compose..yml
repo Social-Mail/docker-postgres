@@ -43,18 +43,12 @@ services:
 
   certbot:
     container_name: test-pg-cert-bot
-    image: certbot/dns-route53
-    command: 
-      - certonly
-      - --dry-run
-      - --cert-name
-      - local-db.socialmail.in
-      - -d
-      - local-db.socialmail.in
-      - --dns-route53
-      - --non-interactive
+    build:
+      context: ../pg-ssl
     environment:
       - AWS_CONFIG_FILE=/var/aws/credentials
+      - CERT_NAME=local-db.socialmail.in
+      - DOMAIN_NAME=local-db.socialmail.in
     volumes:
       - ./test.env:/var/aws/credentials
       - certs:/etc/letsencrypt
