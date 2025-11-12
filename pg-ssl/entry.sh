@@ -2,6 +2,6 @@
 
 echo "Starting up"
 
-exec ./script.sh
+./script.sh
 
 crond -l 0 -f -c /etc/crontabs
