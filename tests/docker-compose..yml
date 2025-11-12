@@ -51,6 +51,7 @@ services:
     environment:
       - CERT_NAME=local-db.socialmail.in
       - DOMAIN_NAME=local-db.socialmail.in
+      - CERTBOT_ENV=staging
     env_file:
       - ./test.env
     volumes:
