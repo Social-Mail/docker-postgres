@@ -1,4 +1,5 @@
 #!/bin/sh
+
 certbot \
     certonly \
     --staging \
@@ -7,6 +8,7 @@ certbot \
     -d \
     $DOMAIN_NAME \
     --dns-route53 \
-    --non-interactive
+    --non-interactive \
+    --agree-tos \
 
 crond -l 0 -f -c /etc/crontabs

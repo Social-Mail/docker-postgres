@@ -8,3 +8,4 @@ certbot \
     $DOMAIN_NAME \
     --dns-route53 \
     --non-interactive \
+    --agree-tos \    

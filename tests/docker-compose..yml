@@ -46,11 +46,11 @@ services:
     build:
       context: ../pg-ssl
     environment:
-      - AWS_CONFIG_FILE=/var/aws/credentials
       - CERT_NAME=local-db.socialmail.in
       - DOMAIN_NAME=local-db.socialmail.in
+    env_file:
+      - ./test.env
     volumes:
-      - ./test.env:/var/aws/credentials
       - certs:/etc/letsencrypt
 
 volumes:
