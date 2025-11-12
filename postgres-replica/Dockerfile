@@ -2,10 +2,7 @@ FROM postgres:alpine
 
 RUN apk add --no-cache gosu
 
-VOLUME [ "/db/wal" ]
-
-COPY ./primary.conf /etc/postgresql/postgresql.conf
-COPY ./create-user.sql /docker-entrypoint-initdb.d
+COPY ./pg.conf /etc/postgresql/postgresql.conf
 
 RUN mkdir -p /db/wal/
 RUN mkdir -p /db/wal/archives/

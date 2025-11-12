@@ -16,6 +16,8 @@ services:
       - certs:/etc/letsencrypt
     ports:
       - 5432:5432
+    networks:
+      - pg_test_network
 
   s3mock:
     image: adobe/s3mock:latest
@@ -26,6 +28,8 @@ services:
       - debug=true
     ports:
       - 9090:9090
+    networks:
+      - pg_test_network
 
   primary-postgres-backup:
     container_name: test-primary-postgres-backup
@@ -44,6 +48,26 @@ services:
       - test-db-wal:/db/wal
       - test-db-socket:/var/run/postgresql
       - test-backup-cache:/cache
+    networks:
+      - pg_test_network
+
+  postgres-replica:
+    container_name: test-pg-replica
+    build: ../postgres-replica
+    environment:
+      - PGDATA=/data
+      - PG_MASTER=primary-postgres
+      - PG_REPLICATOR_USER=replicator
+      - PG_REPLICATOR_PASSWORD=replicatorPassword
+      - SSL_CERT_FILE=/etc/letsencrypt/live/local-db.socialmail.in/fullchain.pem
+      - SSL_KEY_FILE=/etc/letsencrypt/live/local-db.socialmail.in/privkey.pem
+    ports:
+      - 5433:5432
+    volumes:
+      - test-replica-data:/data
+      - certs:/etc/letsencrypt
+    networks:
+      - pg_test_network
 
   certbot:
     container_name: test-pg-cert-bot
@@ -57,6 +81,22 @@ services:
       - ./test.env
     volumes:
       - certs:/etc/letsencrypt
+    networks:
+      - pg_test_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: test-pg-admin-1
+    restart: unless-stopped
+    environment:
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_DEFAULT_EMAIL=x@x.com
+      - PGADMIN_DEFAULT_PASSWORD=x
+      - PGADMIN_DISABLE_POSTFIX=True
+    ports:
+      - 9999:80
+    networks:
+      - pg_test_network
 
 volumes:
   test-db-wal:
@@ -69,3 +109,9 @@ volumes:
     external: false
   certs:
     external: false    
+  test-replica-data:
+    external: false
+
+networks:
+  pg_test_network:
+    driver: bridge
