@@ -31,6 +31,7 @@
         "clamd",
         "clamdscan",
         "clamscan",
+        "combinebackup",
         "crond",
         "crontabs",
         "dataurls",

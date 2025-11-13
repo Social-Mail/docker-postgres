@@ -14,5 +14,10 @@ chown -R postgres:postgres /db/wal
 chown -R postgres:postgres /etc/postgresql/postgresql.conf
 chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 
+if [ -d "$PG_RESTORE" ]; then
+
+    env PGDATA=$PGDATA exec "$PG_RESTORE/extract.sh"
+
+fi
 
 docker-entrypoint.sh "$@"

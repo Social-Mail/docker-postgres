@@ -1,11 +1,11 @@
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { globalEnv } from "../globalEnv.js";
 import BaseStorage from "./BaseStorage.js";
 import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
 import Hash from "./Hash.js";
-import { createReadStream } from "node:fs";
-import { join } from "node:path";
+import { createReadStream, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 export default class S3Storage extends BaseStorage {
 
@@ -31,14 +31,16 @@ export default class S3Storage extends BaseStorage {
     }
 
     async getConfig() {
+        const Key = join(this.folder, "config.json");
         try {
-            const Key = join(this.folder, "config.json");
             const r = await this.client.send(new GetObjectCommand({
                 Bucket: this.bucket,
                 Key
             }));
             return JSON.parse(await r.Body.transformToString());
-        } catch {
+        } catch (error) {
+            console.error(`Failed to download config from ${Key}`);
+            console.error(error);
             return {};
         }
     }
@@ -61,6 +63,10 @@ export default class S3Storage extends BaseStorage {
             Bucket: this.bucket,
             Key
         }));
+        const dir = dirname(localPath);
+        if (!existsSync(dir)) {
+            await mkdir(dir, { recursive: true });
+        }
         await writeFile(localPath, r.Body as Readable);
     }
 
