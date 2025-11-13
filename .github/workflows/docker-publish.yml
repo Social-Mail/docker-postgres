@@ -51,7 +51,7 @@ jobs:
 
 
       - name: Build and push Docker image
-        id: push
+        id: postgres-primary
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: ./postgres-primary
@@ -59,7 +59,7 @@ jobs:
           tags: social-mail/docker-postgres-primary:latest, social-mail/docker-postgres-primary:${{ github.sha }}
 
       - name: Build and push Docker image
-        id: push
+        id: pg-backup
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: ./pg-backup
@@ -67,7 +67,7 @@ jobs:
           tags: social-mail/pg-backup:latest, social-mail/pg-backup:${{ github.sha }}
 
       - name: Build and push Docker image
-        id: push
+        id: postgres-replica
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: ./postgres-replica
@@ -75,7 +75,7 @@ jobs:
           tags: social-mail/postgres-replica:latest, social-mail/postgres-replica:${{ github.sha }}
 
       - name: Build and push Docker image
-        id: push
+        id: pg-ssl
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: ./pg-ssl
