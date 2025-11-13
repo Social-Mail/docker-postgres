@@ -1,7 +1,7 @@
 import { join } from "path";
 import S3Storage from "./storage/S3Storage.js";
 import { globalEnv } from "./globalEnv.js";
-import { existsSync, writeFileSync } from "fs";
+import { existsSync } from "fs";
 import { spawnPromise } from "./spawnPromise.js";
 import { opendir } from "fs/promises";
 
