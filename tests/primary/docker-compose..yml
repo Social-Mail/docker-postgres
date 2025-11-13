@@ -4,7 +4,7 @@ services:
     container_name: test-primary-postgres
     restart: always
     build:
-      context: ../postgres-primary
+      context: ../../postgres-primary
     environment:
       - POSTGRES_PASSWORD=abcd123
       - PG_REPLICATOR_PASSWORD=replicatorPassword
@@ -28,7 +28,7 @@ services:
       - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=containers3root
       - debug=true
     volumes:
-      - ./backups/data:/containers3root
+      - ../backups/data:/containers3root
     ports:
       - 9090:9090
     networks:
@@ -38,7 +38,7 @@ services:
     container_name: test-primary-postgres-backup
     restart: always
     build:
-      context: ../pg-backup
+      context: ../../pg-backup
     environment:
       - POSTGRES_PASSWORD=abcd123
       - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
@@ -56,7 +56,7 @@ services:
 
   postgres-replica:
     container_name: test-pg-replica
-    build: ../postgres-replica
+    build: ../../postgres-replica
     environment:
       - PGDATA=/data
       - PG_MASTER=primary-postgres
@@ -75,7 +75,7 @@ services:
   certbot:
     container_name: test-pg-cert-bot
     build:
-      context: ../pg-ssl
+      context: ../../pg-ssl
     environment:
       - CERT_NAME=local-db.socialmail.in
       - DOMAIN_NAME=local-db.socialmail.in
