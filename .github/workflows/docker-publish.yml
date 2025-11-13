@@ -56,7 +56,7 @@ jobs:
         with:
           context: ./postgres-primary
           push: true
-          tags: social-mail/docker-postgres-primary:latest, social-mail/docker-postgres-primary:${{ github.sha }}
+          tags: ghcr.io/social-mail/docker-postgres-primary:latest, ghcr.io/social-mail/docker-postgres-primary:${{ github.sha }}
 
       - name: Build and push Docker image
         id: pg-backup
@@ -64,7 +64,7 @@ jobs:
         with:
           context: ./pg-backup
           push: true
-          tags: social-mail/pg-backup:latest, social-mail/pg-backup:${{ github.sha }}
+          tags: ghcr.io/social-mail/pg-backup:latest, ghcr.io/social-mail/pg-backup:${{ github.sha }}
 
       - name: Build and push Docker image
         id: postgres-replica
@@ -72,7 +72,7 @@ jobs:
         with:
           context: ./postgres-replica
           push: true
-          tags: social-mail/postgres-replica:latest, social-mail/postgres-replica:${{ github.sha }}
+          tags: ghcr.io/social-mail/postgres-replica:latest, ghcr.io/social-mail/postgres-replica:${{ github.sha }}
 
       - name: Build and push Docker image
         id: pg-ssl
@@ -80,4 +80,4 @@ jobs:
         with:
           context: ./pg-ssl
           push: true
-          tags: social-mail/pg-ssl:latest, social-mail/pg-ssl:${{ github.sha }}
+          tags: ghcr.io/social-mail/pg-ssl:latest, ghcr.io/social-mail/pg-ssl:${{ github.sha }}
