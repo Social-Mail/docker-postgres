@@ -56,6 +56,7 @@ export default class S3Storage extends BaseStorage {
 
     async download({ cloudPath, localPath }): Promise<void> {
         const Key = join(this.folder, cloudPath);
+        console.log(`Downloading ${cloudPath} to ${localPath}`);
         const r = await this.client.send(new GetObjectCommand({
             Bucket: this.bucket,
             Key

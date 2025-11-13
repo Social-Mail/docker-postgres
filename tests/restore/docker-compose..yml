@@ -3,7 +3,7 @@ services:
 
   s3mock:
     image: adobe/s3mock:latest
-    container_name: s3mock
+    container_name: s3mock-restore
     environment:
       - COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=bucket1
       - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
@@ -14,40 +14,22 @@ services:
     ports:
       - 9090:9090
     networks:
-      - pg_test_network
+      - pg_restore_network
 
   primary-postgres-backup:
-    container_name: test-primary-postgres-backup
+    container_name: test-restore-backup
     restart: always
     build:
       context: ../../pg-backup
-    environment:
-      - POSTGRES_PASSWORD=abcd123
-      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
-      - PG_BACKUP_STORAGE_S3_BUCKET=bucket1
-      - PG_BACKUP_STORAGE_S3_ACCESS_KEY_ID=foo
-      - PG_BACKUP_STORAGE_S3_SECRET=bar
-      - PG_RESTORE_FOLDER=/var/pgdata
-      - PG_RESTORE_TIME=latest
+    env_file:
+      - ../var.env
     entrypoint: ["/sbin/tini", "--", "npm", "run", "restore"]
-    depends_on:
-      - primary-postgres
     volumes:
-      - test-db-wal:/db/wal
-      - test-db-socket:/var/run/postgresql
-      - test-backup-cache:/cache
+      - ../wal/:/db/wal
       - ../pg-data:/var/pgdata
     networks:
-      - pg_test_network
-
-volumes:
-  test-db-wal:
-    external: false
-  test-db-socket:
-    external: false
-  test-replica-data:
-    external: false
+      - pg_restore_network
 
 networks:
-  pg_test_network:
+  pg_restore_network:
     driver: bridge
