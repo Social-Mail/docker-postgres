@@ -13,7 +13,7 @@ services:
     volumes:
       - test-db-wal:/db/wal
       - test-db-socket:/var/run/postgresql
-      - certs:/etc/letsencrypt
+      - ../certs:/etc/letsencrypt
     ports:
       - 5432:5432
     networks:
@@ -68,7 +68,7 @@ services:
       - 5433:5432
     volumes:
       - test-replica-data:/data
-      - certs:/etc/letsencrypt
+      - ../certs:/etc/letsencrypt
     networks:
       - pg_test_network
 
@@ -83,7 +83,7 @@ services:
     env_file:
       - ../test.env
     volumes:
-      - certs:/etc/letsencrypt
+      - ../certs:/etc/letsencrypt
     networks:
       - pg_test_network
 
@@ -110,8 +110,6 @@ volumes:
     external: false
   localstack-data:
     external: false
-  certs:
-    external: false    
   test-replica-data:
     external: false
 

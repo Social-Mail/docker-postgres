@@ -139,5 +139,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 tests/test.env
 
+tests/certs/
+tests/pg-data/
 tests/backups/data/
 tests/primary/test.env
