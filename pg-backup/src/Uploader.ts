@@ -26,13 +26,40 @@ export class Uploader {
         // upload all files...
         await this.storage.sync({ cloudPath: this.folder, localPath: this.backupFolder });
 
+        await this.cleanUp();
+
+    }
+
+    async cleanUp() {
+        for(;;) {
+            let processed = false;
+            const ds = await opendir(globalEnv.folders.backup);
+            for await (const dir of ds) {
+                if(dir.isDirectory()) {
+                    const current = join(dir.parentPath, dir.name);
+                    if (current === this.backupFolder) {
+                        break;
+                    }
+                    processed = true;
+                    {
+                        using _d = ds;
+                        await this.storage.sync({ cloudPath: dir.name, localPath: current });
+                    }
+                    await spawnPromise("rm", ["-rf", current]);
+                    break;
+                }
+            }
+            if(!processed) {
+                break;
+            }
+        }
     }
 
     async takeBackup(folder: string, diff = false) {
 
         const type = diff ? "diff" : "full";
 
-        const fullBackupName = join(folder, "base.tar");
+        const fullBackupName = join(folder, "base.tar.gz");
 
         // check if storage exists..
         if (!existsSync(fullBackupName)) {
@@ -48,6 +75,7 @@ export class Uploader {
                     "-U", globalEnv.source.user,
                     "-w",
                     "-F", "t",
+                    "-z",
                     "-R"];
 
             if (diff) {
