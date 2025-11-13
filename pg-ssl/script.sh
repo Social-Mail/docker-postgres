@@ -2,6 +2,8 @@
 
 if [ "$CERTBOT_ENV" == "staging" ]; then
 
+echo "Trying staging server"
+
 certbot \
     certonly \
     --staging \
