@@ -1,0 +1,49 @@
+name: postgres-primary
+services:
+  primary-postgres:
+    container_name: primary-postgres
+    image: ghcr.io/social-mail/postgres-primary:latest
+    restart: always
+    env_file:
+      - ../var.env
+    volumes:
+      - ../wal:/db/wal
+      - db-socket:/var/run/postgresql
+      - ../pgdata:/var/pgdata
+      - ../certs:/etc/letsencrypt
+    ports:
+      - 5432:5432
+    networks:
+      - pg_network
+
+  primary-postgres-backup:
+    container_name: primary-postgres-backup
+    restart: always
+    image: ghcr.io/social-mail/pg-backup:latest
+    depends_on:
+      - primary-postgres
+    volumes:
+      - db-socket:/var/run/postgresql
+      - ../backups:/cache
+    env_file:
+      - ../var.env
+    networks:
+      - pg_network
+
+  certbot:
+    container_name: pg-cert-bot
+    image: ghcr.io/social-mail/pg-ssl:latest 
+    env_file:
+      - ../var.env
+    volumes:
+      - ../certs:/etc/letsencrypt
+    networks:
+      - pg_network
+
+volumes:
+  db-socket:
+    external: false
+
+networks:
+  pg_network:
+    driver: bridge

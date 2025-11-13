@@ -6,9 +6,9 @@ certbot \
     certonly \
     --staging \
     --cert-name \
-    $CERT_NAME \
+    $HOST_NAME \
     -d \
-    $DOMAIN_NAME \
+    $HOST_NAME \
     --dns-route53 \
     --non-interactive \
     --agree-tos \
@@ -18,9 +18,9 @@ else
 certbot \
     certonly \
     --cert-name \
-    $CERT_NAME \
+    $HOST_NAME \
     -d \
-    $DOMAIN_NAME \
+    $HOST_NAME \
     --dns-route53 \
     --non-interactive \
     --agree-tos \

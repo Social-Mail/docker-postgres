@@ -5,14 +5,12 @@ services:
     restart: always
     build:
       context: ../../postgres-primary
-    environment:
-      - POSTGRES_PASSWORD=abcd123
-      - PG_REPLICATOR_PASSWORD=replicatorPassword
-      - SSL_CERT_FILE=/etc/letsencrypt/live/local-db.socialmail.in/fullchain.pem
-      - SSL_KEY_FILE=/etc/letsencrypt/live/local-db.socialmail.in/privkey.pem
+    env_file:
+      - ../var.env
     volumes:
-      - test-db-wal:/db/wal
+      - ../wal:/db/wal
       - test-db-socket:/var/run/postgresql
+      - ../pgdata:/var/pgdata
       - ../certs:/etc/letsencrypt
     ports:
       - 5432:5432
@@ -28,7 +26,7 @@ services:
       - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=containers3root
       - debug=true
     volumes:
-      - ../backups/data:/containers3root
+      - ../s3/data:/containers3root
     ports:
       - 9090:9090
     networks:
@@ -39,18 +37,13 @@ services:
     restart: always
     build:
       context: ../../pg-backup
-    environment:
-      - POSTGRES_PASSWORD=abcd123
-      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
-      - PG_BACKUP_STORAGE_S3_BUCKET=bucket1
-      - PG_BACKUP_STORAGE_S3_ACCESS_KEY_ID=foo
-      - PG_BACKUP_STORAGE_S3_SECRET=bar
+    env_file:
+      - ../var.env
     depends_on:
       - primary-postgres
     volumes:
-      - test-db-wal:/db/wal
       - test-db-socket:/var/run/postgresql
-      - test-backup-cache:/cache
+      - ../backups:/cache
     networks:
       - pg_test_network
 
@@ -59,11 +52,8 @@ services:
     build: ../../postgres-replica
     environment:
       - PGDATA=/data
-      - PG_MASTER=primary-postgres
-      - PG_REPLICATOR_USER=replicator
-      - PG_REPLICATOR_PASSWORD=replicatorPassword
-      - SSL_CERT_FILE=/etc/letsencrypt/live/local-db.socialmail.in/fullchain.pem
-      - SSL_KEY_FILE=/etc/letsencrypt/live/local-db.socialmail.in/privkey.pem
+    env_file:
+      - ../var.env
     ports:
       - 5433:5432
     volumes:
@@ -76,12 +66,8 @@ services:
     container_name: test-pg-cert-bot
     build:
       context: ../../pg-ssl
-    environment:
-      - CERT_NAME=local-db.socialmail.in
-      - DOMAIN_NAME=local-db.socialmail.in
-      - CERTBOT_ENV=staging
     env_file:
-      - ../test.env
+      - ../var.env
     volumes:
       - ../certs:/etc/letsencrypt
     networks:
@@ -102,13 +88,7 @@ services:
       - pg_test_network
 
 volumes:
-  test-db-wal:
-    external: false
   test-db-socket:
-    external: false
-  test-backup-cache:
-    external: false
-  localstack-data:
     external: false
   test-replica-data:
     external: false

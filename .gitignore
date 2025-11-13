@@ -140,6 +140,10 @@ vite.config.ts.timestamp-*
 tests/test.env
 
 tests/certs/
-tests/pg-data/
-tests/backups/data/
+tests/pgdata/
+tests/backups/
 tests/primary/test.env
+tests/var.env
+tests/wal/
+tests/s3/
+
