@@ -24,7 +24,6 @@ services:
       - COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=bucket1
       - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
       - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=containers3root
-      - debug=true
     volumes:
       - ../s3/data:/containers3root
     ports:
