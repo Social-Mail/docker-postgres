@@ -57,7 +57,7 @@ jobs:
         with:
           context: ./postgres-primary
           push: true
-          tags: ghcr.io/social-mail/docker-postgres-primary:latest, ghcr.io/social-mail/docker-postgres-primary:${{ github.sha }}
+          tags: ghcr.io/social-mail/postgres-primary:latest, ghcr.io/social-mail/postgres-primary:${{ github.sha }}
 
       - name: Build and push Docker image
         id: pg-backup
