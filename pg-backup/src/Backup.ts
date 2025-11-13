@@ -1,11 +1,11 @@
 import { join } from "path";
 import S3Storage from "./storage/S3Storage.js";
 import { globalEnv } from "./globalEnv.js";
-import { existsSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { spawnPromise } from "./spawnPromise.js";
 import { opendir } from "fs/promises";
 
-export class Uploader {
+export class Backup {
 
     storage = new S3Storage();
 
@@ -32,26 +32,24 @@ export class Uploader {
 
     async cleanUp() {
         for(;;) {
-            let processed = false;
+            let current = void 0;
             const ds = await opendir(globalEnv.folders.backup);
             for await (const dir of ds) {
                 if(dir.isDirectory()) {
-                    const current = join(dir.parentPath, dir.name);
-                    if (current === this.backupFolder) {
-                        break;
-                    }
-                    processed = true;
-                    {
-                        using _d = ds;
+                    current = join(dir.parentPath, dir.name);
+                    if (current !== this.backupFolder) {
                         await this.storage.sync({ cloudPath: dir.name, localPath: current });
+                    } else {
+                        current = void 0;
                     }
-                    await spawnPromise("rm", ["-rf", current]);
                     break;
                 }
             }
-            if(!processed) {
-                break;
+            if (current) {
+                await spawnPromise("rm", ["-rf", current]);
+                continue;
             }
+            break;
         }
     }
 
@@ -66,6 +64,9 @@ export class Uploader {
             // lets us create a backup...
 
             const tempBackupFolder = folder + "." + Date.now();
+
+            // write latest as this one...
+            await this.storage.saveConfig({ latest: this.folder, time: this.time });
 
             console.log(`Taking ${type} backup at ${tempBackupFolder}`);
 
