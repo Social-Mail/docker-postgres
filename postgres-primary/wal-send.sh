@@ -1,2 +1,2 @@
 #!/bin/sh
-aws s3 cp $1 "s3://$PG_BACKUP_STORAGE_S3_BUCKET/wal/$2"
+aws s3 cp $1 "s3://$PG_BACKUP_STORAGE_S3_BUCKET/$PG_BACKUP_STORAGE_S3_WAL_FOLDER/$2"
