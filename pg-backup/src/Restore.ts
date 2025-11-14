@@ -2,7 +2,8 @@ import { dirname, join } from "node:path";
 import S3Storage from "./storage/S3Storage.js"
 // import { promises } from "node:timers";
 import { spawnPromise } from "./spawnPromise.js";
-import { mkdir, unlink } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { globalEnv } from "./globalEnv.js";
 
 export default class Restore {
 
@@ -38,7 +39,19 @@ export default class Restore {
             }
         }
 
+        const pgRestore = globalEnv.folders.restore;
 
+        await writeFile(join(tmpRoot, "restore.sh"), `#!/bin/sh
+pg_combinebackup -o ${pgRestore} ${manifests.join(" ")}
+`);
+
+
+        await spawnPromise("mkdir", ["-p", dirname(pgRestore)]);
+
+        // copy everything to restore folder...
+        await spawnPromise("mv", [tmpRoot, pgRestore]);
+
+        await spawnPromise("chmod", ["+x", join(pgRestore, "restore.sh")]);
 
 
     }

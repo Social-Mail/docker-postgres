@@ -18,6 +18,7 @@ export const globalEnv = {
         password: process.env.POSTGRES_PASSWORD
     },
     folders: {
-        backup: process.env.PG_BACKUP_FOLDER || "/cache"
-    }
+        backup: process.env.PG_BACKUP_FOLDER || "/cache",
+        restore: process.env.PG_RESTORE || "/cache/restore"
+    },
 };
