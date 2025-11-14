@@ -1,8 +1,12 @@
 FROM postgres:alpine
+
+RUN apk add --no-cache gosu
+
 VOLUME [ "/db/wal" ]
 
-COPY ./primary.conf /etc/postgresql/postgresql.conf
+COPY ./postgresql.conf /etc/postgresql/postgresql.conf
 COPY ./pg_hba.conf /etc/postgresql/pg_hba.conf
+
 COPY ./create-user.sh /docker-entrypoint-initdb.d/
 
 WORKDIR /app

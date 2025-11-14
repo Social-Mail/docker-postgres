@@ -1,0 +1,14 @@
+name: postgres-test-restore
+services:
+
+  primary-postgres-backup:
+    container_name: test-restore-backup
+    image: ghcr.io/social-mail/pg-backup:latest
+    restart: no
+    env_file:
+      - ../var.env
+    environment:
+      - PGDATA=/var/pgdata
+    entrypoint: ["/sbin/tini", "--", "npm", "run", "restore"]
+    volumes:
+      - ../pgdata-restore:/var/pg-restore

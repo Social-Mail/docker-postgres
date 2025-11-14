@@ -7,6 +7,8 @@ services:
       context: ../../postgres-primary
     env_file:
       - ../var.env
+    environment:
+      - PGDATA=/var/pgdata
     volumes:
       - ../wal:/db/wal
       - test-db-socket:/var/run/postgresql
@@ -50,9 +52,10 @@ services:
 
   postgres-replica:
     container_name: test-pg-replica
-    build: ../../postgres-replica
+    build: ../../postgres-primary
     environment:
       - PGDATA=/data
+      - PG_MODE=replica
     env_file:
       - ../var.env
     ports:

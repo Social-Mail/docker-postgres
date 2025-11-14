@@ -1,3 +1,11 @@
+########################################################################
+#
+# WARNING
+#
+# Make sure volume mounts are correct and run this only after you have
+# executed step 1 correctly.
+########################################################################
+
 name: postgres-primary
 services:
 
@@ -17,6 +25,8 @@ services:
     restart: always
     env_file:
       - ../var.env
+    environment:
+      - PG_RESTORE=/var/pg-restore
     volumes:
       - ../wal:/db/wal
       - db-socket:/var/run/postgresql

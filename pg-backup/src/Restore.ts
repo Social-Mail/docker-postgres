@@ -5,6 +5,7 @@ import { spawnPromise } from "./spawnPromise.js";
 import { mkdir, opendir, readdir, unlink, writeFile } from "node:fs/promises";
 import { globalEnv } from "./globalEnv.js";
 import { existsSync } from "node:fs";
+import FileHelper from "./FileHelper.js";
 
 export default class Restore {
 
@@ -19,6 +20,12 @@ export default class Restore {
         if(!folder) {
             throw new Error("No latest backup exist");
         }
+
+        const pgRestore = globalEnv.folders.restore;
+
+        await spawnPromise("mkdir", ["-p", dirname(pgRestore)]);
+
+        await FileHelper.clearFolder(pgRestore);
 
         // load all into a temp folder...
         const tmpRoot = "/tmp/backups/" + Date.now();
@@ -35,11 +42,7 @@ export default class Restore {
             }
         }
 
-        const pgRestore = globalEnv.folders.restore;
 
-
-
-        await spawnPromise("mkdir", ["-p", dirname(pgRestore)]);
 
         const folders = await readdir(tmpRoot, { withFileTypes: true });
         for(const { name, parentPath } of folders) {

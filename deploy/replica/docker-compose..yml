@@ -29,21 +29,27 @@ services:
     networks:
       - pg_network
 
-  primary-postgres-backup:
-    container_name: primary-postgres-backup
-    restart: always
-    image: ghcr.io/social-mail/pg-backup:latest
-    environment:
-      - PG_BACKUP_STORAGE_S3_FOLDER=pg-1
-    depends_on:
-      - postgres
-    volumes:
-      - db-socket:/var/run/postgresql
-      - ../backups:/cache
-    env_file:
-      - ../var.env
-    networks:
-      - pg_network
+  # Usually we don't need to take backup of replica
+  # But you can uncomment following to enable backup
+  # Make sure you don't overwrite primary instance backups
+  # You can change folder name as specified below
+
+  # primary-postgres-backup:
+  #   container_name: primary-postgres-backup
+  #   restart: always
+  #   image: ghcr.io/social-mail/pg-backup:latest
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - PG_BACKUP_STORAGE_S3_FOLDER=pg-2
+  #   volumes:
+  #     - db-socket:/var/run/postgresql
+  #     - ../backups:/cache
+  #   env_file:
+  #     - ../var.env
+  #   networks:
+  #     - pg_network
+
 
 
 volumes:

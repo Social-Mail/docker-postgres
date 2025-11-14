@@ -18,6 +18,8 @@ services:
 
   primary-postgres-backup:
     container_name: test-restore-backup
+    depends_on:
+      - s3mock
     restart: no
     build:
       context: ../../pg-backup
@@ -25,6 +27,7 @@ services:
       - ../var.env
     environment:
       - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock-restore:9090
+      - PGDATA=/var/pgdata
     entrypoint: ["/sbin/tini", "--", "npm", "run", "restore"]
     volumes:
       - ../pgdata-restore:/var/pg-restore

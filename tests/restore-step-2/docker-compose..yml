@@ -15,6 +15,7 @@ services:
       - ../pgdata-restore:/var/pg-restore
     environment:
       - PG_RESTORE=/var/pg-restore
+      - PGDATA=/var/pgdata
     ports:
       - 5432:5432
     networks:
