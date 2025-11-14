@@ -4,6 +4,7 @@ services:
   certbot:
     container_name: pg-cert-bot
     image: ghcr.io/social-mail/pg-ssl:latest 
+    restart: always
     env_file:
       - ../var.env
     volumes:
