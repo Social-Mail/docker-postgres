@@ -76,8 +76,7 @@ export class Backup {
                     "-U", globalEnv.source.user,
                     "-w",
                     "-F", "t",
-                    "-z",
-                    "-R"];
+                    "-z"];
 
             if (diff) {
 
@@ -89,8 +88,9 @@ export class Backup {
                         lastDir = join(dir.parentPath, dir.name);
                     }
                 }
-
                 args.push("-i", join(lastDir, "backup_manifest") );
+            } else {
+                args.push("-R");
             }
 
             const { status } = await spawnPromise(

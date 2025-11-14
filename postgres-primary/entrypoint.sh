@@ -17,6 +17,8 @@ chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 if [ -d "$PG_RESTORE" ]; then
 
     env PGDATA=$PGDATA "$PG_RESTORE/restore.sh"
+    touch "$PGDATA/recovery.signal"
+    mv $PG_RESTORE "$PG_RESTORE.done"
 
 fi
 
