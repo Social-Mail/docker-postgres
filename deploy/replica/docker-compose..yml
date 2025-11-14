@@ -18,6 +18,8 @@ services:
     restart: always
     env_file:
       - ../var.env
+    environment:
+      - PG_MODE=replica
     volumes:
       - ../wal:/db/wal
       - db-socket:/var/run/postgresql
