@@ -51,19 +51,23 @@ export default class Restore {
 
         folders.length = 0;
 
+        const increments = [];
+
         using ds = await opendir(pgRestore, { recursive: true });
         for await(const d of ds) {
             if (d.isDirectory()) {
-                const manifest = join(d.parentPath, d.name, "backup_manifest");
-                console.log(`Checking ${manifest}`);
+                const incFolder = join(d.parentPath, d.name);
+                const manifest = join(incFolder, "backup_manifest");
                 if (existsSync(manifest)) {
-                    folders.push(d);
+                    increments.push(incFolder);
+                    // const relativeFolder = relative(incFolder, pgRestore);
+                    // increments.push(relativeFolder);
                 }
             }
         }
 
         await writeFile(join(pgRestore, "restore.sh"), `#!/bin/sh
-pg_combinebackup -o ${pgRestore} ${folders.join(" ")}
+pg_combinebackup -o ${globalEnv.folders.data} ${increments.join(" ")}
 `);
 
         await spawnPromise("chmod", ["+x", join(pgRestore, "restore.sh")]);

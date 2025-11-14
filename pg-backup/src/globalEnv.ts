@@ -1,3 +1,11 @@
+const forceEnv = (name) => {
+    const v = process.env[name];
+    if (v === null || v === void 0) {
+        throw new Error(`Environment variable ${name} is not specified`);
+    }
+    return v;
+}
+
 export const globalEnv = {
 
     storage: {
@@ -19,6 +27,9 @@ export const globalEnv = {
     },
     folders: {
         backup: process.env.PG_BACKUP_FOLDER || "/cache",
-        restore: process.env.PG_RESTORE || "/cache/restore"
+        restore: process.env.PG_RESTORE || "/cache/restore",
+        get data() {
+            return forceEnv("PGDATA");
+        }
     },
 };

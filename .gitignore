@@ -141,6 +141,8 @@ tests/test.env
 
 tests/certs/
 tests/pgdata/
+tests/pgdata-restore/
+tests/pgdata-restored/
 tests/backups/
 tests/primary/test.env
 tests/var.env

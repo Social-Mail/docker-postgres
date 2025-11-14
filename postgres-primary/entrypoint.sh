@@ -16,7 +16,7 @@ chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 
 if [ -d "$PG_RESTORE" ]; then
 
-    env PGDATA=$PGDATA exec "$PG_RESTORE/extract.sh"
+    env PGDATA=$PGDATA "$PG_RESTORE/restore.sh"
 
 fi
 

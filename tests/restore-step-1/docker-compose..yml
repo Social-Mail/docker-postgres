@@ -27,7 +27,7 @@ services:
       - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock-restore:9090
     entrypoint: ["/sbin/tini", "--", "npm", "run", "restore"]
     volumes:
-      - ../restore-data:/var/pg-restore
+      - ../pgdata-restore:/var/pg-restore
     networks:
       - pg_restore_network
 

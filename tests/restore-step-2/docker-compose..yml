@@ -1,0 +1,102 @@
+name: postgres-test-primary
+services:
+  primary-postgres:
+    container_name: test-primary-postgres
+    restart: always
+    build:
+      context: ../../postgres-primary
+    env_file:
+      - ../var.env
+    volumes:
+      - ../wal:/db/wal
+      - test-db-socket:/var/run/postgresql
+      - ../pgdata-restored:/var/pgdata
+      - ../certs:/etc/letsencrypt
+      - ../pgdata-restore:/var/pg-restore
+    environment:
+      - PG_RESTORE=/var/pg-restore
+    ports:
+      - 5432:5432
+    networks:
+      - pg_test_network
+
+  s3mock:
+    image: adobe/s3mock:latest
+    container_name: s3mock
+    environment:
+      - COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=bucket1
+      - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
+      - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=containers3root
+    volumes:
+      - ../s3/data:/containers3root
+    ports:
+      - 9090:9090
+    networks:
+      - pg_test_network
+
+  primary-postgres-backup:
+    container_name: test-primary-postgres-backup
+    restart: always
+    build:
+      context: ../../pg-backup
+    env_file:
+      - ../var.env
+    depends_on:
+      - primary-postgres
+    environment:
+      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
+    volumes:
+      - test-db-socket:/var/run/postgresql
+      - ../backups:/cache
+    networks:
+      - pg_test_network
+
+  postgres-replica:
+    container_name: test-pg-replica
+    build: ../../postgres-replica
+    environment:
+      - PGDATA=/data
+    env_file:
+      - ../var.env
+    ports:
+      - 5433:5432
+    volumes:
+      - test-replica-data:/data
+      - ../certs:/etc/letsencrypt
+    networks:
+      - pg_test_network
+
+  certbot:
+    container_name: test-pg-cert-bot
+    build:
+      context: ../../pg-ssl
+    env_file:
+      - ../var.env
+    volumes:
+      - ../certs:/etc/letsencrypt
+    networks:
+      - pg_test_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: test-pg-admin-1
+    restart: unless-stopped
+    environment:
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_DEFAULT_EMAIL=x@x.com
+      - PGADMIN_DEFAULT_PASSWORD=x
+      - PGADMIN_DISABLE_POSTFIX=True
+    ports:
+      - 9999:80
+    networks:
+      - pg_test_network
+
+volumes:
+  test-db-socket:
+    external: false
+  test-replica-data:
+    external: false
+
+networks:
+  pg_test_network:
+    driver: bridge
