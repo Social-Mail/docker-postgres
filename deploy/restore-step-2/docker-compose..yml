@@ -44,7 +44,7 @@ services:
     restart: always
     image: ghcr.io/social-mail/pg-backup:latest
     environment:
-      - PG_BACKUP_STORAGE_S3_FOLDER=pg-1
+      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=pg-1
     depends_on:
       - postgres
     volumes:
