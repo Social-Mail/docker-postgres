@@ -14,12 +14,20 @@ chown -R postgres:postgres /db/wal
 chown -R postgres:postgres /etc/postgresql/postgresql.conf
 chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 
+if [ -f "$PG_RESTORE/restored.done" ]; then
+
+    # mv $PG_RESTORE "$PG_RESTORE.done"
+    echo "DB Restored"
+
+else
+
 if [ -d "$PG_RESTORE" ]; then
 
-    env PGDATA=$PGDATA "$PG_RESTORE/restore.sh"
+    "$PG_RESTORE/restore.sh"
     touch "$PGDATA/recovery.signal"
-    mv $PG_RESTORE "$PG_RESTORE.done"
+    touch "$PG_RESTORE/restored.done"
 
+fi
 fi
 
 docker-entrypoint.sh "$@"
