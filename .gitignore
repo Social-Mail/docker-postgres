@@ -147,3 +147,4 @@ tests/var.env
 tests/wal/
 tests/s3/
 
+tests/restore-data/

@@ -1,9 +1,10 @@
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import S3Storage from "./storage/S3Storage.js"
 // import { promises } from "node:timers";
 import { spawnPromise } from "./spawnPromise.js";
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { mkdir, opendir, readdir, unlink, writeFile } from "node:fs/promises";
 import { globalEnv } from "./globalEnv.js";
+import { existsSync } from "node:fs";
 
 export default class Restore {
 
@@ -22,8 +23,6 @@ export default class Restore {
         // load all into a temp folder...
         const tmpRoot = "/tmp/backups/" + Date.now();
 
-        const manifests = [];
-
         // download everything...
         for await(const { cloudPath } of this.storage.list(folder)) {
             const localPath = join(tmpRoot, cloudPath);
@@ -34,22 +33,38 @@ export default class Restore {
                 await spawnPromise("tar", ["-xvzf", localPath, "-C", localFolder]);
                 await unlink(localPath);
             }
-            if(localPath.endsWith("backup_manifest")) {
-                manifests.push(dirname(localPath));
-            }
         }
 
         const pgRestore = globalEnv.folders.restore;
 
-        await writeFile(join(tmpRoot, "restore.sh"), `#!/bin/sh
-pg_combinebackup -o ${pgRestore} ${manifests.join(" ")}
-`);
 
 
         await spawnPromise("mkdir", ["-p", dirname(pgRestore)]);
 
-        // copy everything to restore folder...
-        await spawnPromise("mv", [tmpRoot, pgRestore]);
+        const folders = await readdir(tmpRoot, { withFileTypes: true });
+        for(const { name, parentPath } of folders) {
+            const source = join(parentPath, name);
+            const relativeFolder = relative(tmpRoot, source);
+            const dest = join(pgRestore, relativeFolder);
+            await spawnPromise("mv", [ source, dest])
+        }
+
+        folders.length = 0;
+
+        using ds = await opendir(pgRestore, { recursive: true });
+        for await(const d of ds) {
+            if (d.isDirectory()) {
+                const manifest = join(d.parentPath, d.name, "backup_manifest");
+                console.log(`Checking ${manifest}`);
+                if (existsSync(manifest)) {
+                    folders.push(d);
+                }
+            }
+        }
+
+        await writeFile(join(pgRestore, "restore.sh"), `#!/bin/sh
+pg_combinebackup -o ${pgRestore} ${folders.join(" ")}
+`);
 
         await spawnPromise("chmod", ["+x", join(pgRestore, "restore.sh")]);
 

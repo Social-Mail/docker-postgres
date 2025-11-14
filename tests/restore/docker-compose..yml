@@ -5,7 +5,6 @@ services:
     image: adobe/s3mock:latest
     container_name: s3mock-restore
     environment:
-      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock-restore:9090
       - COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=bucket1
       - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
       - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=containers3root
@@ -19,11 +18,13 @@ services:
 
   primary-postgres-backup:
     container_name: test-restore-backup
-    restart: always
+    restart: no
     build:
       context: ../../pg-backup
     env_file:
       - ../var.env
+    environment:
+      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock-restore:9090
     entrypoint: ["/sbin/tini", "--", "npm", "run", "restore"]
     volumes:
       - ../restore-data:/var/pg-restore
