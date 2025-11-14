@@ -10,4 +10,7 @@ WORKDIR /app
 COPY ./entry.sh ./
 COPY ./script.sh ./
 
+RUN chmod +x ./entry.sh
+RUN chmod +x ./script.sh
+
 ENTRYPOINT ["/app/entry.sh"]
