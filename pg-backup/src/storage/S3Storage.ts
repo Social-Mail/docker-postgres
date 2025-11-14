@@ -4,6 +4,7 @@ import BaseStorage from "./BaseStorage.js";
 import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
 import Hash from "./Hash.js";
+import * as crypto from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -14,9 +15,23 @@ export default class S3Storage extends BaseStorage {
     prefix: string;
     folder: string;
 
+    encryption: { SSECustomerKey: string; SSECustomerAlgorithm: string; SSECustomerKeyMD5: string; };
+
     constructor() {
         super();
         const { endpoint, accessKeyId, secretAccessKey, region, bucket, folder } = globalEnv.storage.s3;
+        const { password } = globalEnv.source;
+
+        const keyBuffer = crypto.createHash("sha256")
+            .update(password)
+            .digest();
+
+        const SSECustomerKey = keyBuffer.toString("base64");
+        const SSECustomerAlgorithm = "AES256";
+        const SSECustomerKeyMD5 = crypto.createHash("md5").update(keyBuffer).digest("base64");
+
+        this.encryption = { SSECustomerKey, SSECustomerAlgorithm, SSECustomerKeyMD5 };
+
         this.bucket = bucket;
         this.folder = folder;
         this.client = new S3Client({
@@ -33,7 +48,9 @@ export default class S3Storage extends BaseStorage {
     async getConfig() {
         const Key = join(this.folder, "config.json");
         try {
+            
             const r = await this.client.send(new GetObjectCommand({
+                ... this.encryption,
                 Bucket: this.bucket,
                 Key
             }));
@@ -49,7 +66,9 @@ export default class S3Storage extends BaseStorage {
         const Key = join(this.folder, "config.json");
         const Body = JSON.stringify(config);
         console.log(`Saving config ${Body} at ${Key}`);
+
         await this.client.send(new PutObjectCommand({
+            ... this.encryption,
             Bucket: this.bucket,
             Key,
             Body
@@ -60,8 +79,9 @@ export default class S3Storage extends BaseStorage {
         const Key = join(this.folder, cloudPath);
         console.log(`Downloading ${cloudPath} to ${localPath}`);
         const r = await this.client.send(new GetObjectCommand({
+            ... this.encryption,
             Bucket: this.bucket,
-            Key
+            Key,
         }));
         const dir = dirname(localPath);
         if (!existsSync(dir)) {
@@ -79,6 +99,7 @@ export default class S3Storage extends BaseStorage {
         await this.client.send(new PutObjectCommand({
             Bucket: this.bucket,
             Key,
+            ... this.encryption,
             ChecksumSHA256,
             Body: createReadStream(localPath)
         }));
@@ -117,6 +138,7 @@ export default class S3Storage extends BaseStorage {
         const Key = join(this.folder, cloudPath);
         const command = new HeadObjectCommand({
             Bucket: this.bucket,
+            ... this.encryption,
             ChecksumMode: "ENABLED",
             Key,
         });
