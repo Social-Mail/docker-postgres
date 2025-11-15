@@ -26,7 +26,6 @@ if [ "$CERTBOT_ENV" == "staging" ]; then
             $HOST_NAME \
             -d \
             $HOST_NAME \
-            --dns-route53 \
             --non-interactive \
             --agree-tos \
 
@@ -55,7 +54,6 @@ else
             $HOST_NAME \
             -d \
             $HOST_NAME \
-            --dns-route53 \
             --non-interactive \
             --agree-tos \
 
