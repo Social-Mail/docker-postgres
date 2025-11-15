@@ -18,6 +18,10 @@ chown -R postgres:postgres /db/wal
 chown -R postgres:postgres /etc/postgresql/postgresql.conf
 chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 
+echo "$PG_BACKUP_STORAGE_S3_ENC_PASSWORD" > /app/.pwd
+sha256sum /app/.pwd > /app/.pwd-hash
+base64 /app/.pwd-hash > /app/.pwd-base64
+
 if [ "$PG_MODE" == "replica" ]; then
 
     export PGPASSWORD="$PG_REPLICATOR_PASSWORD"
