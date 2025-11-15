@@ -19,11 +19,10 @@ export default class S3Storage extends BaseStorage {
 
     constructor() {
         super();
-        const { endpoint, accessKeyId, secretAccessKey, region, bucket, folder } = globalEnv.storage.s3;
-        const { password } = globalEnv.source;
+        const { endpoint, accessKeyId, secretAccessKey, region, bucket, folder, encryptionPassword } = globalEnv.storage.s3;
 
         const keyBuffer = crypto.createHash("sha256")
-            .update(password)
+            .update(encryptionPassword)
             .digest();
 
         const SSECustomerKey = keyBuffer.toString("base64");

@@ -1,7 +1,7 @@
 import { promises } from "timers";
 import { Backup } from "./Backup.js";
 
-const oneMinute = 60*60*1000;
+const oneMinute = 60*1000;
 const interval = oneMinute * 15;
 
 (async function() {
