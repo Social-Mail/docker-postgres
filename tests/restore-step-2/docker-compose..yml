@@ -75,6 +75,8 @@ services:
       - ../var.env
     volumes:
       - ../certs:/etc/letsencrypt
+    ports:
+      - "80:80"
     networks:
       - pg_test_network
 
