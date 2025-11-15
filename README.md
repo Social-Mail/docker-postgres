@@ -10,7 +10,8 @@ Docker image with postgres installation with Certbot and WAL configuration. This
 1. AWS Route 53 and S3
 2. Ubuntu 24+
 3. Docker
-4. A domain name must be hosted in Route 53.
+4. PORT 80 must be open, if not, please enable dns challenge
+5. For dns challenge a domain name must be hosted in Route 53. And uncomment challenge type in var.env
 
 ## Topology
 
