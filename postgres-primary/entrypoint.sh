@@ -19,8 +19,9 @@ chown -R postgres:postgres /etc/postgresql/postgresql.conf
 chown -R postgres:postgres /etc/postgresql/pg_hba.conf
 
 echo "$PG_BACKUP_STORAGE_S3_ENC_PASSWORD" > /app/.pwd
-sha256sum /app/.pwd > /app/.pwd-hash
-base64 /app/.pwd-hash > /app/.pwd-base64
+sha256sum /app/.pwd | head -c 32 > /app/.pwd-hash
+rm /app/.pwd
+chown -R postgres:postgres /app/.pwd-hash
 
 if [ "$PG_MODE" == "replica" ]; then
 
