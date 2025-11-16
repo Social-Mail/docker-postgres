@@ -55,6 +55,9 @@ export default class S3Storage extends BaseStorage {
             }));
             return JSON.parse(await r.Body.transformToString());
         } catch (error) {
+             if (error.name === 'NotFound') {
+                return {}; // File does not exist
+            }
             console.error(`Failed to download config from ${Key}`);
             console.error(error);
             return {};
