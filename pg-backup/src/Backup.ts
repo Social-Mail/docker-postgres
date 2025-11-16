@@ -88,6 +88,9 @@ export class Backup {
 
                 // find last backup_manifest...
                 let lastDir = join(this.backupFolder, latest.time);
+                if (!existsSync(lastDir)) {
+                    lastDir = this.backupFolder;
+                }
                 args.push("-i", join(lastDir, "backup_manifest") );
             } else {
                 args.push("-R");
