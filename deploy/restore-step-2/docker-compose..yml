@@ -34,6 +34,7 @@ services:
       - db-socket:/var/run/postgresql
       - ../pgdata:/var/pgdata
       - ../certs:/etc/letsencrypt
+      - ../pgdata-restore:/var/pg-restore
     depends_on:
       - certbot
     ports:

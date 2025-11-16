@@ -85,7 +85,10 @@ export class Backup {
                 using ds = await opendir(this.backupFolder);
                 for await (const dir of ds) {
                     if(dir.isDirectory()) {
-                        lastDir = join(dir.parentPath, dir.name);
+                        const current = join(dir.parentPath, dir.name);
+                        if (current.localeCompare(lastDir) > 0) {
+                            lastDir = current;
+                        }
                     }
                 }
                 args.push("-i", join(lastDir, "backup_manifest") );
