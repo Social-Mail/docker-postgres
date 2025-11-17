@@ -60,7 +60,7 @@ export default class Restore {
         for await(const d of ds) {
             if (d.isDirectory()) {
                 const incFolder = join(d.parentPath, d.name);
-                const manifest = join(incFolder, "backup_manifest");
+                const manifest = join(incFolder, "PG_VERSION");
                 if (existsSync(manifest)) {
                     increments.push(incFolder);
                     // const relativeFolder = relative(incFolder, pgRestore);
