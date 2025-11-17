@@ -38,11 +38,13 @@ services:
     image: ghcr.io/social-mail/pg-backup:latest
     environment:
       - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=pg-1
+      # - PG_RESTORE=/var/pg-restore ## Uncomment only once to restore, comment after restore
     depends_on:
       - postgres
     volumes:
       - db-socket:/var/run/postgresql
       - ../backups:/cache
+      # - ../pgdata-restore:/var/pg-restore ## Uncomment only once to restore, comment after restore
     env_file:
       - ../var.env
     networks:
