@@ -4,10 +4,13 @@ services:
   certbot:
     container_name: pg-cert-bot
     image: ghcr.io/social-mail/pg-ssl:latest 
+    restart: always
     env_file:
       - ../var.env
     volumes:
       - ../certs:/etc/letsencrypt
+    ports:
+      - "80:80"
     networks:
       - pg_network
 
@@ -17,6 +20,8 @@ services:
     restart: always
     env_file:
       - ../var.env
+    environment:
+      - PG_MODE=replica
     volumes:
       - ../wal:/db/wal
       - db-socket:/var/run/postgresql
@@ -41,7 +46,7 @@ services:
   #   depends_on:
   #     - postgres
   #   environment:
-  #     - PG_BACKUP_STORAGE_S3_FOLDER=pg-2
+  #     - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=pg-2
   #   volumes:
   #     - db-socket:/var/run/postgresql
   #     - ../backups:/cache

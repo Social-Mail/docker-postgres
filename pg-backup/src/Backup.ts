@@ -65,6 +65,8 @@ export class Backup {
 
             const tempBackupFolder = folder + "." + Date.now();
 
+            const latest = await this.storage.getConfig();
+
             // write latest as this one...
             await this.storage.saveConfig({ latest: this.folder, time: this.time });
 
@@ -81,13 +83,14 @@ export class Backup {
 
             if (diff) {
 
+                if (!latest.time) {
+                    throw new Error("storage does not contain last config");
+                }
+
                 // find last backup_manifest...
-                let lastDir = this.backupFolder;
-                using ds = await opendir(this.backupFolder);
-                for await (const dir of ds) {
-                    if(dir.isDirectory()) {
-                        lastDir = join(dir.parentPath, dir.name);
-                    }
+                let lastDir = join(this.backupFolder, latest.time);
+                if (!existsSync(lastDir)) {
+                    lastDir = this.backupFolder;
                 }
                 args.push("-i", join(lastDir, "backup_manifest") );
             } else {

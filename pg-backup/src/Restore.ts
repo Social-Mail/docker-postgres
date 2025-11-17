@@ -68,6 +68,7 @@ export default class Restore {
                 }
             }
         }
+        increments.sort((a, b) => a.localeCompare(b));
 
         await writeFile(join(pgRestore, "restore.sh"), `#!/bin/sh
 pg_combinebackup -o ${globalEnv.folders.data} ${increments.join(" ")}

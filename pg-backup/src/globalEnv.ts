@@ -15,7 +15,8 @@ export const globalEnv = {
             region: process.env.PG_BACKUP_STORAGE_S3_REGION || "us-east-1",
             bucket: process.env.PG_BACKUP_STORAGE_S3_BUCKET,
             endpoint: process.env.PG_BACKUP_STORAGE_S3_ENDPOINT,
-            folder: process.env.PG_BACKUP_STORAGE_S3_FOLDER || "pg-backups"
+            folder: process.env.PG_BACKUP_STORAGE_S3_BACKUP_FOLDER || "pg-backups",
+            encryptionPassword: process.env.PG_BACKUP_STORAGE_S3_ENC_PASSWORD
         },
     },
     source: {

@@ -72,6 +72,8 @@ services:
       context: ../../pg-ssl
     env_file:
       - ../var.env
+    ports:
+      - "80:80"
     volumes:
       - ../certs:/etc/letsencrypt
     networks:
