@@ -62,9 +62,8 @@ export default class Restore {
                 const incFolder = join(d.parentPath, d.name);
                 const manifest = join(incFolder, "PG_VERSION");
                 if (existsSync(manifest)) {
+                    console.log(`${manifest} exists ?`)
                     increments.push(incFolder);
-                    // const relativeFolder = relative(incFolder, pgRestore);
-                    // increments.push(relativeFolder);
                 }
             }
         }
