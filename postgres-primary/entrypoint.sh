@@ -53,7 +53,12 @@ else
 
         if [ -d "$PG_RESTORE" ]; then
 
+            echo "Combining backups"
+
             "$PG_RESTORE/restore.sh"
+
+            echo "Starting Recovery"
+
             touch "$PGDATA/recovery.signal"
             touch "$PG_RESTORE/restored.done"
 
