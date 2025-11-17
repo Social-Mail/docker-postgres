@@ -60,9 +60,8 @@ export default class Restore {
         for await(const d of ds) {
             if (d.isDirectory()) {
                 const incFolder = join(d.parentPath, d.name);
-                const manifest = join(incFolder, "PG_VERSION");
+                const manifest = join(incFolder, "backup_label");
                 if (existsSync(manifest)) {
-                    console.log(`${manifest} exists ?`)
                     increments.push(incFolder);
                 }
             }
