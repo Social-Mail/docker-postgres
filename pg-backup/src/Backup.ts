@@ -77,7 +77,6 @@ export class Backup {
                     "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
-                    "-X", "n", // wal with incremental backups fails regularly if some piece is missing
                     "-F", "t",
                     "-z"];
 

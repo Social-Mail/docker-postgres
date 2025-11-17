@@ -47,6 +47,7 @@ else
 
         # mv $PG_RESTORE "$PG_RESTORE.done"
         echo "DB Restored"
+        rm "$PGDATA/recovery.signal"
 
     else
 
