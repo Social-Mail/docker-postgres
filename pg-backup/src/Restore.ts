@@ -36,7 +36,7 @@ export default class Restore {
             await this.storage.download({ cloudPath, localPath });
             if (localPath.endsWith(".tar.gz")) {
                 const localFolder = localPath.endsWith("pg_wal.tar.gz")
-                    ? dirname(join(localPath, "pg_wal"))
+                    ? join(dirname(localPath), "pg_wal")
                     : dirname(localPath);
                 await mkdir(localFolder, { recursive: true });
                 await spawnPromise("tar", ["-xvzf", localPath, "-C", localFolder]);
