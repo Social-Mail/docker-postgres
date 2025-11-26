@@ -3,7 +3,7 @@ import S3Storage from "./storage/S3Storage.js";
 import { globalEnv } from "./globalEnv.js";
 import { existsSync } from "fs";
 import { spawnPromise } from "./spawnPromise.js";
-import { opendir } from "fs/promises";
+import { mkdir, opendir } from "fs/promises";
 
 export class Backup {
 
@@ -63,7 +63,9 @@ export class Backup {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            const tempBackupFolder = folder + "." + Date.now();
+            const tempBackupFolder = "/tmp/pg-backup-" + Date.now();
+
+            await mkdir(tempBackupFolder, { recursive: true });
 
             const latest = await this.storage.getConfig();
 
