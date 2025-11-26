@@ -1,8 +1,9 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, stat, writeFile } from "node:fs/promises";
 import { globalEnv } from "../globalEnv.js";
 import BaseStorage from "./BaseStorage.js";
-import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command, CreateMultipartUploadCommand, UploadPartCommandInput, UploadPartCommand } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
+import { Upload } from "@aws-sdk/lib-storage";
 import Hash from "./Hash.js";
 import * as crypto from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
@@ -94,17 +95,23 @@ export default class S3Storage extends BaseStorage {
 
     async upload({ cloudPath, localPath }) {
         const Key = join(this.folder, cloudPath);
-        const ChecksumSHA256 = await Hash.hash(localPath);
 
-        console.log(`Uploading ${localPath} to ${cloudPath}`);
-
-        await this.client.send(new PutObjectCommand({
-            Bucket: this.bucket,
-            Key,
-            ... this.encryption,
-            ChecksumSHA256,
-            Body: createReadStream(localPath)
-        }));
+        const uploadRequest = new Upload({
+            client: this.client,
+            params: {
+                Bucket: this.bucket,
+                Key,
+                ... this.encryption,
+                Body: createReadStream(localPath)
+            },
+            queueSize: 4,
+            partSize: 1024*1024*128,
+            leavePartsOnError: false
+        });
+        uploadRequest.on("httpUploadProgress", (progress) => {
+            console.log(progress);
+        });
+        await uploadRequest.done();
     }
 
     async *list(cloudPath, signal?: AbortSignal, throwIfAborted = false) {
