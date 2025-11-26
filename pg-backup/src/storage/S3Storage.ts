@@ -7,6 +7,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import * as crypto from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import Hash from "./Hash.js";
 
 export default class S3Storage extends BaseStorage {
 
@@ -95,13 +96,16 @@ export default class S3Storage extends BaseStorage {
     async upload({ cloudPath, localPath }) {
         const Key = join(this.folder, cloudPath);
 
+        const ChecksumSHA256 = await Hash.hash(localPath);
+
         const uploadRequest = new Upload({
             client: this.client,
             params: {
                 Bucket: this.bucket,
                 Key,
                 ... this.encryption,
-                Body: createReadStream(localPath)
+                Body: createReadStream(localPath),
+                ChecksumSHA256
             },
             queueSize: 4,
             partSize: 1024*1024*128,
