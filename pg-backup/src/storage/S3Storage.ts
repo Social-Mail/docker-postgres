@@ -1,10 +1,9 @@
-import { mkdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { globalEnv } from "../globalEnv.js";
 import BaseStorage from "./BaseStorage.js";
-import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command, CreateMultipartUploadCommand, UploadPartCommandInput, UploadPartCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
 import { Upload } from "@aws-sdk/lib-storage";
-import Hash from "./Hash.js";
 import * as crypto from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
