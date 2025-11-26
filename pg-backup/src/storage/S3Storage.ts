@@ -108,8 +108,9 @@ export default class S3Storage extends BaseStorage {
             leavePartsOnError: false
         });
         uploadRequest.on("httpUploadProgress", (progress) => {
-            console.log(progress);
+            console.log(`Uploading ${localPath} to ${cloudPath} - ${progress}`);
         });
+        console.log(`Uploaded ${localPath} to ${cloudPath}`);
         await uploadRequest.done();
     }
 
