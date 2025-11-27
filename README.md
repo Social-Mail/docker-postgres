@@ -70,10 +70,10 @@ Restore from backup requires 2 steps. `var.env` remains same as primary.
     +--var.env (environment variables)
 ```
 2. pgdata folder is where all postgres data file will be stored. We recommend using host folder instead of docker volume to prevent accidental deletion or volume corruption.
-3. Copy samples `deploy/restore-step-1/docker-compose.yml` and `deploy/restore-step-2/docker-compose.yml` to `pg/pg-compose/docker-compose.yml`.
+3. Copy samples `deploy/restore-step-1/docker-compose.yml` and `deploy/primary/docker-compose.yml` to `pg/primary/docker-compose.yml`.
 4. Make sure all values in `var.env` are correct.
 5. Run `cd ./pg/restore-step-1`
 6. Run `sudo docker compose run -d`.
    If for any reason restore fails, delete everything and retry again. Run step 8 only if step 6 succeeds.
-7. Run `cd ./pg/pg-compose`
+7. Run `cd ./pg/primary`
 8. Run `sudo docker compose run -d`.
