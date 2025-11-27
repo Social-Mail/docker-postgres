@@ -7,7 +7,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import * as crypto from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
-import Hash from "./Hash.js";
+import CRC from "./CRC.js";
 
 export default class S3Storage extends BaseStorage {
 
@@ -96,7 +96,7 @@ export default class S3Storage extends BaseStorage {
     async upload({ cloudPath, localPath }) {
         const Key = join(this.folder, cloudPath);
 
-        const ChecksumSHA256 = await Hash.hash(localPath);
+        const ChecksumCRC64NVME = await CRC.CRC64NVME(localPath);
 
         const uploadRequest = new Upload({
             client: this.client,
@@ -105,9 +105,9 @@ export default class S3Storage extends BaseStorage {
                 Key,
                 ... this.encryption,
                 Body: createReadStream(localPath),
-                ChecksumAlgorithm: "SHA256",
+                ChecksumAlgorithm: "CRC64NVME",
                 ChecksumType: "FULL_OBJECT",
-                ChecksumSHA256
+                ChecksumCRC64NVME
             },
             queueSize: 4,
             partSize: 1024*1024*128,
@@ -152,7 +152,7 @@ export default class S3Storage extends BaseStorage {
 
     }
 
-    async exists(cloudPath, hash: string) {
+    async exists(cloudPath, localPath) {
         const Key = join(this.folder, cloudPath);
         const command = new HeadObjectCommand({
             Bucket: this.bucket,
@@ -162,11 +162,9 @@ export default class S3Storage extends BaseStorage {
         });
 
         try {
+            const ChecksumCRC64NVME = await CRC.CRC64NVME(localPath);
             const result = await this.client.send(command);
-            if (result.ChecksumSHA256 === hash) {
-                return true; // File exists
-            }
-            return false;
+            return result.ChecksumCRC64NVME === ChecksumCRC64NVME;
         } catch (error) {
             if (error.name === 'NotFound') {
                 return false; // File does not exist
