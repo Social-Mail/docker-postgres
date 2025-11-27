@@ -106,6 +106,7 @@ export default class S3Storage extends BaseStorage {
                 ... this.encryption,
                 Body: createReadStream(localPath),
                 ChecksumAlgorithm: "SHA256",
+                ChecksumType: "FULL_OBJECT",
                 ChecksumSHA256
             },
             queueSize: 4,
