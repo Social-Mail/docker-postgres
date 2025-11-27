@@ -55,7 +55,9 @@ export default class S3Upload {
             const partNumber = ++i;
             all.push(await this.tm.queueRun(() => this.uploadBlock(partNumber, uploadRequest, buffer)));
             sent += buffer.length;
-            console.log(`Uploading... ${this.filePath} to ${this.Key} progress ${(sent*100/total).toFixed(2)}%`)
+            if (sent < total) {
+                console.log(`Uploading... ${this.filePath} to ${this.Key} progress ${(sent*100/total).toFixed(2)}%`)
+            }
         }
 
         const Parts = await Promise.all(all);
@@ -87,7 +89,7 @@ export default class S3Upload {
             ChecksumAlgorithm: this.ChecksumAlgorithm,
             ChecksumCRC64NVME,
             Body: buffer,
-            ... this.encryption,
+            ... this.encryption
         }));
         return {
             ETag: r.ETag,

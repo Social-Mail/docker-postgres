@@ -42,8 +42,8 @@ services:
       - ../var.env
     depends_on:
       - primary-postgres
-    environment:
-      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
+    # environment:
+    #   - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
     volumes:
       - test-db-socket:/var/run/postgresql
       - ../backups:/cache
