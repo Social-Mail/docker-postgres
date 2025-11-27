@@ -3,11 +3,11 @@ import { globalEnv } from "../globalEnv.js";
 import BaseStorage from "./BaseStorage.js";
 import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
-import { Upload } from "@aws-sdk/lib-storage";
 import * as crypto from "node:crypto";
-import { createReadStream, existsSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import CRC from "./CRC.js";
+import S3Upload from "./S3Upload.js";
 
 export default class S3Storage extends BaseStorage {
 
@@ -96,31 +96,16 @@ export default class S3Storage extends BaseStorage {
     async upload({ cloudPath, localPath }) {
         const Key = join(this.folder, cloudPath);
 
-        const ChecksumCRC64NVME = await CRC.CRC64NVME(localPath);
-
-        const uploadRequest = new Upload({
-            client: this.client,
-            params: {
+        const uploadRequest = new S3Upload(
+            this.client,
+            {
                 Bucket: this.bucket,
                 Key,
-                ... this.encryption,
-                Body: createReadStream(localPath),
-                ChecksumAlgorithm: "CRC64NVME",
-                ChecksumType: "FULL_OBJECT",
-                ChecksumCRC64NVME
-            },
-            queueSize: 4,
-            partSize: 1024*1024*128,
-            leavePartsOnError: false
-        });
-        uploadRequest.on("httpUploadProgress", (progress) => {
-            if (progress.total === progress.total) {
-                console.log(`Uploaded ${localPath} to ${cloudPath}`);
-                return;
+                encryption: this.encryption,
+                filePath: localPath
             }
-            console.log(`Uploading ${localPath} to ${cloudPath} - ${(progress.loaded * 100/ progress.total).toFixed(2)}%`);
-        });
-        await uploadRequest.done();
+        );
+        await uploadRequest.upload();
     }
 
     async *list(cloudPath, signal?: AbortSignal, throwIfAborted = false) {
@@ -162,9 +147,12 @@ export default class S3Storage extends BaseStorage {
         });
 
         try {
-            const ChecksumCRC64NVME = await CRC.CRC64NVME(localPath);
+            const ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: localPath });
             const result = await this.client.send(command);
-            return result.ChecksumCRC64NVME === ChecksumCRC64NVME;
+            if(result.ChecksumCRC64NVME === ChecksumCRC64NVME) {
+                return true;
+            }
+            console.log(`Checksome didn't match ${ChecksumCRC64NVME} !== ${result.ChecksumCRC64NVME}`);
         } catch (error) {
             if (error.name === 'NotFound') {
                 return false; // File does not exist
