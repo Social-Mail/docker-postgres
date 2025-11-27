@@ -8,7 +8,7 @@ export default class S3Upload {
     public readonly filePath: string;
     public readonly Bucket: string;
     public readonly Key: string;
-    public readonly ChecksumCRC64NVME: string;
+    private ChecksumCRC64NVME: string;
     public readonly ChecksumAlgorithm = "CRC64NVME";
     public readonly ChecksumType = "FULL_OBJECT";
 
@@ -29,6 +29,8 @@ export default class S3Upload {
 
     async upload() {
 
+        this.ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: this.filePath });
+
         const uploadRequest = await this.client.send(new CreateMultipartUploadCommand({
             Bucket: this.Bucket,
             Key: this.Key,
@@ -38,6 +40,7 @@ export default class S3Upload {
         }));
 
         const localFile = new LocalFile(this.filePath);
+
 
         const BlockSize = 64*1024*1024;
 
