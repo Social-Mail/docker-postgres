@@ -10,10 +10,18 @@ const interval = oneMinute * 15;
 
     let retries = 0;
 
+    let lastFolder;
+
     for(;;) {
 
         try {
             const [folder, time] = (new Date()).toJSON().replaceAll(":", "-").replace("T", "/").split("/");
+            if (lastFolder && lastFolder !== folder) {
+                // crc64 breaks after 24 hours so we should exit and let docker restart the process again.
+                process.exit(0);
+                return;
+            }
+            lastFolder = folder;
 
             const uploader = new Backup(folder, time);
             await uploader.upload();
