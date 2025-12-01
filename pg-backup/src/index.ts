@@ -8,6 +8,8 @@ const interval = oneMinute * 15;
 
     await promises.setTimeout(5*1000);
 
+    let retries = 0;
+
     for(;;) {
 
         try {
@@ -15,13 +17,20 @@ const interval = oneMinute * 15;
 
             const uploader = new Backup(folder, time);
             await uploader.upload();
+            retries = 0;
         } catch (error) {
             console.error(error);
-            await promises.setTimeout(15*1000);
+            if (retries > 2) {
+                throw error;
+            }
+            await promises.setTimeout(5*1000);
+            retries++;
             continue;
         }
         await promises.setTimeout(interval);
-        
 
     }
-})().catch(console.error);
+})().catch((error) => {
+    console.error(error);
+    process.exit(1);
+});
