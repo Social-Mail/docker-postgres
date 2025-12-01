@@ -29,6 +29,8 @@ export default class S3Upload {
 
     async upload() {
 
+        console.log(`Uploading... ${this.filePath} to ${this.Key} progress 0%`)
+
         this.ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: this.filePath });
 
         const uploadRequest = await this.client.send(new CreateMultipartUploadCommand({
