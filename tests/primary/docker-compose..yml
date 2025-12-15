@@ -9,6 +9,7 @@ services:
       - ../var.env
     environment:
       - PGDATA=/var/pgdata
+      - PG_BACKUP_STORAGE_S3_WAL_FOLDER=pg-test-1/wal
     volumes:
       - ../wal:/db/wal
       - test-db-socket:/var/run/postgresql
@@ -42,8 +43,9 @@ services:
       - ../var.env
     depends_on:
       - primary-postgres
-    # environment:
-    #   - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
+    environment:
+      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1
+    #  - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
     volumes:
       - test-db-socket:/var/run/postgresql
       - ../backups:/cache
@@ -56,6 +58,8 @@ services:
     environment:
       - PGDATA=/data
       - PG_MODE=replica
+      - PG_BACKUP_STORAGE_S3_WAL_FOLDER=pg-test-1-replica/wal
+      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1-replica
     env_file:
       - ../var.env
     ports:

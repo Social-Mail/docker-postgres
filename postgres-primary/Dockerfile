@@ -1,7 +1,7 @@
 FROM postgres:alpine
 
 RUN apk add --no-cache gosu
-RUN apk add --no-cache aws-cli
+RUN apk add --no-cache aws-cli openssl
 
 VOLUME [ "/db/wal" ]
 

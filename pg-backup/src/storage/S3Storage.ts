@@ -1,13 +1,14 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { globalEnv } from "../globalEnv.js";
 import BaseStorage from "./BaseStorage.js";
 import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
-import * as crypto from "node:crypto";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import CRC from "./CRC.js";
 import S3Upload from "./S3Upload.js";
+import { spawnSync } from "node:child_process";
+import Encryption from "../Encryption.js";
 
 export default class S3Storage extends BaseStorage {
 
@@ -16,21 +17,11 @@ export default class S3Storage extends BaseStorage {
     prefix: string;
     folder: string;
 
-    encryption: { SSECustomerKey: string; SSECustomerAlgorithm: string; SSECustomerKeyMD5: string; };
-
     constructor() {
         super();
-        const { endpoint, accessKeyId, secretAccessKey, region, bucket, folder, encryptionPassword } = globalEnv.storage.s3;
+        const { endpoint, accessKeyId, secretAccessKey, region, bucket, folder } = globalEnv.storage.s3;
 
-        const keyBuffer = crypto.createHash("sha256")
-            .update(encryptionPassword)
-            .digest();
-
-        const SSECustomerKey = keyBuffer.toString("base64");
-        const SSECustomerAlgorithm = "AES256";
-        const SSECustomerKeyMD5 = crypto.createHash("md5").update(keyBuffer).digest("base64");
-
-        this.encryption = { SSECustomerKey, SSECustomerAlgorithm, SSECustomerKeyMD5 };
+        spawnSync("/app/hash-pwd.sh");
 
         this.bucket = bucket;
         this.folder = folder;
@@ -50,7 +41,6 @@ export default class S3Storage extends BaseStorage {
         try {
             
             const r = await this.client.send(new GetObjectCommand({
-                ... this.encryption,
                 Bucket: this.bucket,
                 Key
             }));
@@ -71,7 +61,6 @@ export default class S3Storage extends BaseStorage {
         console.log(`Saving config ${Body} at ${Key}`);
 
         await this.client.send(new PutObjectCommand({
-            ... this.encryption,
             Bucket: this.bucket,
             Key,
             Body
@@ -82,7 +71,6 @@ export default class S3Storage extends BaseStorage {
         const Key = join(this.folder, cloudPath);
         console.log(`Downloading ${cloudPath} to ${localPath}`);
         const r = await this.client.send(new GetObjectCommand({
-            ... this.encryption,
             Bucket: this.bucket,
             Key,
         }));
@@ -90,19 +78,20 @@ export default class S3Storage extends BaseStorage {
         if (!existsSync(dir)) {
             await mkdir(dir, { recursive: true });
         }
-        await writeFile(localPath, r.Body as Readable);
+        await Encryption.writeFile(localPath, r.Body as Readable);
     }
 
     async upload({ cloudPath, localPath }) {
         const Key = join(this.folder, cloudPath);
+
+        await using encrypted = await Encryption.readFile(localPath);
 
         const uploadRequest = new S3Upload(
             this.client,
             {
                 Bucket: this.bucket,
                 Key,
-                encryption: this.encryption,
-                filePath: localPath
+                filePath: encrypted.filePath
             }
         );
         await uploadRequest.upload();
@@ -141,13 +130,13 @@ export default class S3Storage extends BaseStorage {
         const Key = join(this.folder, cloudPath);
         const command = new HeadObjectCommand({
             Bucket: this.bucket,
-            ... this.encryption,
             ChecksumMode: "ENABLED",
             Key,
         });
 
         try {
-            const ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: localPath });
+            await using e = await Encryption.readFile(localPath);
+            const ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: e.filePath });
             const result = await this.client.send(command);
             if(result.ChecksumCRC64NVME === ChecksumCRC64NVME) {
                 return true;

@@ -14,7 +14,7 @@ RUN echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/reposito
     apk update
 
 RUN apk add --no-cache tini
-RUN apk add --no-cache postgresql18-client@edge
+RUN apk add --no-cache postgresql18-client@edge openssl
 
 WORKDIR /app
 VOLUME [ "/cache" ]
@@ -24,6 +24,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/index.js ./
+COPY --from=builder /app/hash-pwd.sh ./
+
+RUN chmod +x ./hash-pwd.sh
 
 ENV NODE_ENV=production
 
