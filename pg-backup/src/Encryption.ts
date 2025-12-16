@@ -13,7 +13,7 @@ export default class Encryption {
             await mkdir(dir, { recursive: true });
         }
         await writeFile(encPath, body);
-        await spawnPromise("openssl", ["enc", "-d", "-aes-256-cbc", "-pbkdf2", "-in", encPath, "-out", filePath, "-pass", "file:/app/.pwd-hash" ]);
+        await spawnPromise("openssl", ["enc", "-d", "-aes-256-cbc", "-nosalt", "-in", encPath, "-out", filePath, "-pass", "file:/app/.pwd-hash" ]);
         await unlink(encPath);
     }
 
@@ -24,7 +24,10 @@ export default class Encryption {
         if (!existsSync(dir)) {
             await mkdir(dir, { recursive: true });
         }
-        await spawnPromise("openssl", ["enc", "-aes-256-cbc", "-pbkdf2", "-in", filePath, "-out", encPath, "-pass", "file:/app/.pwd-hash" ]);
+        if (existsSync(encPath)) {
+            await unlink(encPath);
+        }
+        await spawnPromise("openssl", ["enc", "-aes-256-cbc", "-nosalt", "-in", filePath, "-out", encPath, "-pass", "file:/app/.pwd-hash" ]);
         return {
             filePath: encPath,
             async [Symbol.asyncDispose]() {
