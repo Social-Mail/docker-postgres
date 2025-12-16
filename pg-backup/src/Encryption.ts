@@ -8,7 +8,7 @@ export default class Encryption {
     static async encryptFile(filePath: string) {
 
         const encPath = `${filePath}.enc`;
-        await spawnPromise("openssl", ["enc", "-d", "-aes-256-cbc", "-pbkdf2", "-in", filePath, "-out", encPath, "-pass", "file:/app/.pwd-hash" ]);
+        await spawnPromise("openssl", ["enc", "-aes-256-cbc", "-pbkdf2", "-in", filePath, "-out", encPath, "-pass", "file:/app/.pwd-hash" ]);
         await unlink(filePath);
     }
 
