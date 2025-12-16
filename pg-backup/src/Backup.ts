@@ -58,7 +58,7 @@ export class Backup {
 
         const type = diff ? "diff" : "full";
 
-        const fullBackupName = join(folder, "base.tar.gz");
+        const fullBackupName = join(folder, "base.tar.gz.enc");
 
         // check if storage exists..
         if (!existsSync(fullBackupName)) {
@@ -116,7 +116,8 @@ export class Backup {
                 if (file.isDirectory()) {
                     continue;
                 }
-                await Encryption.encryptFile(join(file.parentPath, file.name));
+                const deleteFile = !file.name.endsWith("manifest");
+                await Encryption.encryptFile(join(file.parentPath, file.name), deleteFile);
             }
 
             // after success

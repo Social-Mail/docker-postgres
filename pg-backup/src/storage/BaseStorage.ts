@@ -21,6 +21,11 @@ export default abstract class BaseStorage {
                 continue;
             }
 
+            // we should only upload .enc files
+            if (!child.name.endsWith(".enc")) {
+                continue;
+            }
+
             const filePath = join(child.parentPath, child.name);
             const relativePath = relative(localPath, filePath );
             const destination = join(cloudPath, relativePath);
