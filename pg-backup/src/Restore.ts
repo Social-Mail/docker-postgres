@@ -32,7 +32,7 @@ export default class Restore {
 
         // download everything...
         for await(const { cloudPath } of this.storage.list(folder)) {
-            const localPath = join(tmpRoot, cloudPath);
+            const localPath = join(tmpRoot, cloudPath).replace(".enc", "");
             await this.storage.download({ cloudPath, localPath });
             if (localPath.endsWith(".tar.gz")) {
                 const localFolder = localPath.endsWith("pg_wal.tar.gz")
