@@ -78,20 +78,18 @@ export default class S3Storage extends BaseStorage {
         if (!existsSync(dir)) {
             await mkdir(dir, { recursive: true });
         }
-        await Encryption.writeFile(localPath, r.Body as Readable);
+        await Encryption.decryptFile(localPath, r.Body as Readable);
     }
 
     async upload({ cloudPath, localPath }) {
         const Key = join(this.folder, cloudPath);
-
-        await using encrypted = await Encryption.readFile(localPath);
 
         const uploadRequest = new S3Upload(
             this.client,
             {
                 Bucket: this.bucket,
                 Key,
-                filePath: encrypted.filePath
+                filePath: localPath
             }
         );
         await uploadRequest.upload();
@@ -135,8 +133,7 @@ export default class S3Storage extends BaseStorage {
         });
 
         try {
-            await using e = await Encryption.readFile(localPath);
-            const ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: e.filePath });
+            const ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: localPath });
             const result = await this.client.send(command);
             if(result.ChecksumCRC64NVME === ChecksumCRC64NVME) {
                 return true;

@@ -3,7 +3,8 @@ import S3Storage from "./storage/S3Storage.js";
 import { globalEnv } from "./globalEnv.js";
 import { existsSync } from "fs";
 import { spawnPromise } from "./spawnPromise.js";
-import { mkdir, opendir } from "fs/promises";
+import { mkdir, opendir, readdir } from "fs/promises";
+import Encryption from "./Encryption.js";
 
 export class Backup {
 
@@ -108,6 +109,16 @@ export class Backup {
             if (status) {
                 throw new Error("backup failed");
             }
+
+            // encrypt every file here...
+
+            for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
+                if (file.isDirectory()) {
+                    continue;
+                }
+                await Encryption.encryptFile(join(file.parentPath, file.name));
+            }
+
             // after success
             await spawnPromise("mv", [tempBackupFolder, folder]);
         }

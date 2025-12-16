@@ -5,7 +5,15 @@ import { existsSync } from "fs";
 
 export default class Encryption {
 
-    static async writeFile(filePath: string, body) {
+    static async encryptFile(filePath: string) {
+
+        const encPath = `${filePath}.enc`;
+        await spawnPromise("openssl", ["enc", "-d", "-aes-256-cbc", "-pbkdf2", "-in", filePath, "-out", encPath, "-pass", "file:/app/.pwd-hash" ]);
+        await unlink(filePath);
+    }
+
+
+    static async decryptFile(filePath: string, body) {
 
         const encPath = `/tmp${filePath}.enc`;
         const dir = dirname(encPath);
@@ -13,27 +21,8 @@ export default class Encryption {
             await mkdir(dir, { recursive: true });
         }
         await writeFile(encPath, body);
-        await spawnPromise("openssl", ["enc", "-d", "-aes-256-cbc", "-nosalt", "-in", encPath, "-out", filePath, "-pass", "file:/app/.pwd-hash" ]);
+        await spawnPromise("openssl", ["enc", "-d", "-aes-256-cbc", "-pbkdf2", "-in", encPath, "-out", filePath, "-pass", "file:/app/.pwd-hash" ]);
         await unlink(encPath);
-    }
-
-    static async readFile(filePath: string) {
-
-        const encPath = `/tmp${filePath}.enc`;
-        const dir = dirname(encPath);
-        if (!existsSync(dir)) {
-            await mkdir(dir, { recursive: true });
-        }
-        if (existsSync(encPath)) {
-            await unlink(encPath);
-        }
-        await spawnPromise("openssl", ["enc", "-aes-256-cbc", "-nosalt", "-in", filePath, "-out", encPath, "-pass", "file:/app/.pwd-hash" ]);
-        return {
-            filePath: encPath,
-            async [Symbol.asyncDispose]() {
-                await unlink(encPath)
-            }
-        };
     }
 
 }
