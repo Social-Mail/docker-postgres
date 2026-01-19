@@ -115,12 +115,13 @@ export class Backup {
             }
 
             // encrypt every file here...
+            console.log(`Encrypting files`);
 
             for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
                 if (file.isDirectory()) {
                     continue;
                 }
-                const deleteFile = !file.name.endsWith("manifest");
+                const deleteFile = file.name !== "backup_manifest";
                 await Encryption.encryptFile(join(file.parentPath, file.name), deleteFile);
             }
 

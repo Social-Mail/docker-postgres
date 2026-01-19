@@ -54,7 +54,7 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
             }
         }
         if (logCommand) {
-            console.log(`Spawn: ${path} ${JSON.stringify(args, undefined, 2)}`);
+            console.log(`${path} ${args.map((x) => x.toString()).map((x) => /\s/.test(x) ? JSON.stringify(x) : x).join(" ")}`);
             if (logData) {
                 console.log(all.join("\n"));
             }
