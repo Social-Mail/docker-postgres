@@ -26,7 +26,7 @@ services:
     env_file:
       - ../var.env
     environment:
-      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock-restore:9090
+      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1
       - PGDATA=/var/pgdata
     entrypoint: ["/sbin/tini", "--", "npm", "run", "restore"]
     volumes:

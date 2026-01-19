@@ -10,9 +10,9 @@ services:
     volumes:
       - ../wal:/db/wal
       - test-db-socket:/var/run/postgresql
-      - ../pgdata-restored:/var/pgdata
       - ../certs:/etc/letsencrypt
       - ../pgdata-restore:/var/pg-restore
+      - ../pgdata:/var/pgdata
     environment:
       - PG_RESTORE=/var/pg-restore
       - PGDATA=/var/pgdata
@@ -45,7 +45,8 @@ services:
     depends_on:
       - primary-postgres
     environment:
-      - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
+      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1
+    #  - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
     volumes:
       - test-db-socket:/var/run/postgresql
       - ../backups:/cache
@@ -54,9 +55,11 @@ services:
 
   postgres-replica:
     container_name: test-pg-replica
-    build: ../../postgres-replica
+    build: ../../postgres-primary
     environment:
       - PGDATA=/data
+      - PG_MODE=replica
+      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1-replica
     env_file:
       - ../var.env
     ports:
@@ -73,10 +76,10 @@ services:
       context: ../../pg-ssl
     env_file:
       - ../var.env
-    volumes:
-      - ../certs:/etc/letsencrypt
     ports:
       - "80:80"
+    volumes:
+      - ../certs:/etc/letsencrypt
     networks:
       - pg_test_network
 

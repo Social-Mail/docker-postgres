@@ -3,7 +3,8 @@ import S3Storage from "./storage/S3Storage.js";
 import { globalEnv } from "./globalEnv.js";
 import { existsSync } from "fs";
 import { spawnPromise } from "./spawnPromise.js";
-import { mkdir, opendir } from "fs/promises";
+import { mkdir, opendir, readdir } from "fs/promises";
+import Encryption from "./Encryption.js";
 
 export class Backup {
 
@@ -57,7 +58,7 @@ export class Backup {
 
         const type = diff ? "diff" : "full";
 
-        const fullBackupName = join(folder, "base.tar.gz");
+        const fullBackupName = join(folder, "base.tar.gz.enc");
 
         // check if storage exists..
         if (!existsSync(fullBackupName)) {
@@ -112,6 +113,17 @@ export class Backup {
             if (status) {
                 throw new Error("backup failed");
             }
+
+            // encrypt every file here...
+
+            for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
+                if (file.isDirectory()) {
+                    continue;
+                }
+                const deleteFile = !file.name.endsWith("manifest");
+                await Encryption.encryptFile(join(file.parentPath, file.name), deleteFile);
+            }
+
             // after success
             await spawnPromise("mv", [tempBackupFolder, folder]);
         }

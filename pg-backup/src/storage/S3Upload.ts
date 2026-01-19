@@ -13,32 +13,29 @@ export default class S3Upload {
     public readonly ChecksumType = "FULL_OBJECT";
 
     tm: TaskManager;
-    encryption: any;
 
     constructor(
         private client: S3Client,
-        { filePath, Bucket, Key, encryption = {} }
+        { filePath, Bucket, Key }
     ) {
         this.filePath = filePath;
         this.Bucket = Bucket;
         this.Key = Key;
-        this.encryption = encryption;
 
         this.tm = new TaskManager();
     }
 
     async upload() {
 
-        console.log(`Uploading... ${this.filePath} to ${this.Key} progress 0%`)
-
         this.ChecksumCRC64NVME = await CRC.CRC64NVME({ filePath: this.filePath });
 
+        console.log(`Uploading... ${this.filePath} to ${this.Key} progress 0%`)
+    
         const uploadRequest = await this.client.send(new CreateMultipartUploadCommand({
             Bucket: this.Bucket,
             Key: this.Key,
             ChecksumType: "FULL_OBJECT",
             ChecksumAlgorithm: "CRC64NVME",
-            ... this.encryption
         }));
 
         const localFile = new LocalFile(this.filePath);
@@ -70,13 +67,13 @@ export default class S3Upload {
             UploadId: uploadRequest.UploadId,
             ChecksumCRC64NVME: this.ChecksumCRC64NVME,
             ChecksumType: this.ChecksumType,
-            ... this.encryption,
             MultipartUpload: {
                 Parts
             }
         }));
 
         console.log(`Uploaded ${this.filePath} to ${this.Key} with checksum ${this.ChecksumCRC64NVME}`)
+
     }
 
     async uploadBlock(PartNumber: number, uploadRequest: CreateMultipartUploadCommandOutput, buffer: Buffer<ArrayBuffer>) {
@@ -91,13 +88,15 @@ export default class S3Upload {
             ChecksumAlgorithm: this.ChecksumAlgorithm,
             ChecksumCRC64NVME,
             Body: buffer,
-            ... this.encryption
         }));
+
         return {
             ETag: r.ETag,
             PartNumber,
             ChecksumCRC64NVME
         };
+
+
     }
 
 
