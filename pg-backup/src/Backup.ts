@@ -96,6 +96,10 @@ export class Backup {
                 args.push("-i", join(lastDir, "backup_manifest") );
             } else {
                 args.push("-R");
+
+                // as we are going to run differential backup
+                // immediately, there is no need to stream and hold the backup process
+                args.push("-X", "n");
             }
 
             const { status } = await spawnPromise(
