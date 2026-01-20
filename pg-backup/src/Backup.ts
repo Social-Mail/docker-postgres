@@ -90,9 +90,15 @@ export class Backup {
                 }
 
                 // find last backup_manifest...
-                let lastDir = join(this.backupFolder, latest.time);
-                if (!existsSync(lastDir)) {
-                    lastDir = this.backupFolder;
+                const times = await readdir(this.backupFolder, { withFileTypes: true });
+                times.sort((a, b) => a.name.localeCompare(b.name));
+                let lastDir;
+                for (const time of times) {
+                    const timeFolder = join(time.parentPath, time.name);
+                    const lf = join(timeFolder, "backup_manifest");
+                    if (existsSync(lf)) {
+                        lastDir = timeFolder;
+                    }
                 }
                 args.push("-i", join(lastDir, "backup_manifest") );
             } else {
@@ -111,6 +117,11 @@ export class Backup {
                     });
 
             if (status) {
+                throw new Error("backup failed");
+            }
+
+            // check if manifest was generated...
+            if(!existsSync(join(tempBackupFolder, "backup_manifest"))) {
                 throw new Error("backup failed");
             }
 
