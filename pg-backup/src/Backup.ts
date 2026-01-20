@@ -94,10 +94,9 @@ export class Backup {
                 times.sort((a, b) => a.name.localeCompare(b.name));
                 let manifest = join(this.backupFolder, "backup_manifest");
                 for (const time of times) {
-                    const timeFolder = join(time.parentPath, time.name);
-                    const lf = join(timeFolder, "backup_manifest");
-                    if (existsSync(lf)) {
-                        manifest = lf;
+                    const lastManifest = join(time.parentPath, time.name, "backup_manifest");
+                    if (existsSync(lastManifest)) {
+                        manifest = lastManifest;
                     }
                 }
                 args.push("-i", manifest );
