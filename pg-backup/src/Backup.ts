@@ -92,15 +92,15 @@ export class Backup {
                 // find last backup_manifest...
                 const times = await readdir(this.backupFolder, { withFileTypes: true });
                 times.sort((a, b) => a.name.localeCompare(b.name));
-                let lastDir;
+                let manifest = join(this.backupFolder, "backup_manifest");
                 for (const time of times) {
                     const timeFolder = join(time.parentPath, time.name);
                     const lf = join(timeFolder, "backup_manifest");
                     if (existsSync(lf)) {
-                        lastDir = timeFolder;
+                        manifest = lf;
                     }
                 }
-                args.push("-i", join(lastDir, "backup_manifest") );
+                args.push("-i", manifest );
             } else {
                 args.push("-R");
 
