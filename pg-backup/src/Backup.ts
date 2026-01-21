@@ -3,7 +3,7 @@ import S3Storage from "./storage/S3Storage.js";
 import { globalEnv } from "./globalEnv.js";
 import { existsSync } from "fs";
 import { spawnPromise } from "./spawnPromise.js";
-import { mkdir, opendir, readdir } from "fs/promises";
+import { mkdir, opendir, readdir, unlink } from "fs/promises";
 import Encryption from "./Encryption.js";
 
 export class Backup {
@@ -145,7 +145,9 @@ export class Backup {
                 if (file.name === "backup_manifest") {
                     continue;
                 }
-                await spawnPromise("gzip", [join(file.parentPath, file.name)]);
+                const srcFile = join(file.parentPath, file.name);
+                await spawnPromise("gzip", [srcFile]);
+                await unlink(srcFile);
             }
 
             for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
