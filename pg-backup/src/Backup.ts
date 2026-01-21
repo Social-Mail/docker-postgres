@@ -64,7 +64,7 @@ export class Backup {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            const tempBackupFolder = "/pg-backup-tmp/pg-backup-" + Date.now();
+            const tempBackupFolder = "/tmp/pg-backup-" + Date.now();
 
             await mkdir(tempBackupFolder, { recursive: true });
 
@@ -80,7 +80,9 @@ export class Backup {
                     "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
-                    "-F", "t"];
+                    "-F", "t",
+                    "-s", "1",
+                    "-z"];
 
             if (diff) {
 
@@ -99,12 +101,8 @@ export class Backup {
                     }
                 }
                 args.push("-i", manifest );
-                args.push("-z");
             } else {
                 args.push("-R");
-                args.push("-t", `server`);
-                args.push("--compress=server-gzip:9");
-                args.push("-D", tempBackupFolder);
 
                 // as we are going to run differential backup
                 // immediately, there is no need to stream and hold the backup process
