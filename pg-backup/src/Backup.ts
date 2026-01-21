@@ -64,7 +64,7 @@ export class Backup {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            const tempBackupFolder = "/tmp/pg-backup-" + Date.now();
+            const tempBackupFolder = "/pg-backup-tmp/pg-backup-" + Date.now();
 
             await mkdir(tempBackupFolder, { recursive: true });
 
@@ -102,6 +102,7 @@ export class Backup {
                 args.push("-i", manifest );
             } else {
                 args.push("-R");
+                args.push("-t", `server:${tempBackupFolder}`),
 
                 // as we are going to run differential backup
                 // immediately, there is no need to stream and hold the backup process
