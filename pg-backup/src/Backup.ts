@@ -102,7 +102,8 @@ export class Backup {
                 args.push("-z");
             } else {
                 args.push("-R");
-                args.push("-t", `server`),
+                args.push("-t", `server`);
+                args.push("--compress=server-gzip:9");
                 args.push("-D", tempBackupFolder);
 
                 // as we are going to run differential backup
