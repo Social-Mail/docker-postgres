@@ -147,7 +147,9 @@ export class Backup {
                 }
                 const srcFile = join(file.parentPath, file.name);
                 await spawnPromise("gzip", [srcFile]);
-                await unlink(srcFile);
+                if (existsSync(srcFile)) {
+                    await unlink(srcFile);
+                }
             }
 
             for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
