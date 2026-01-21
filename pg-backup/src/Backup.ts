@@ -80,8 +80,7 @@ export class Backup {
                     "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
-                    "-F", "t",
-                    "-z"];
+                    "-F", "t"];
 
             if (diff) {
 
@@ -100,9 +99,11 @@ export class Backup {
                     }
                 }
                 args.push("-i", manifest );
+                args.push("-z");
             } else {
                 args.push("-R");
-                args.push("-t", `server:${tempBackupFolder}`),
+                args.push("-t", `server`),
+                args.push("-D", tempBackupFolder);
 
                 // as we are going to run differential backup
                 // immediately, there is no need to stream and hold the backup process
