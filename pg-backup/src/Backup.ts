@@ -81,8 +81,7 @@ export class Backup {
                     "-U", globalEnv.source.user,
                     "-w",
                     "-F", "t",
-                    "-s", "1",
-                    "-z"];
+                    "-s", "1"];
 
             if (diff) {
 
@@ -137,6 +136,17 @@ export class Backup {
 
             // encrypt every file here...
             console.log(`Encrypting files`);
+
+            // gzip files one by one first...
+            for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
+                if (file.isDirectory()) {
+                    continue;
+                }
+                if (file.name === "backup_manifest") {
+                    continue;
+                }
+                await spawnPromise("gzip", [join(file.parentPath, file.name)]);
+            }
 
             for(const file of await readdir(tempBackupFolder, { recursive: true, withFileTypes: true })) {
                 if (file.isDirectory()) {
