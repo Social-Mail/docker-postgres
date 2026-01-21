@@ -116,11 +116,21 @@ export class Backup {
                     });
 
             if (status) {
+                try {
+                    await spawnPromise("rm", ["-rf", tempBackupFolder]);
+                } catch (error) {
+                    console.error(error);
+                }
                 throw new Error("backup failed");
             }
 
             // check if manifest was generated...
             if(!existsSync(join(tempBackupFolder, "backup_manifest"))) {
+                try {
+                    await spawnPromise("rm", ["-rf", tempBackupFolder]);
+                } catch (error) {
+                    console.error(error);
+                }
                 throw new Error("backup failed");
             }
 
