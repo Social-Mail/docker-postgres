@@ -66,7 +66,7 @@ services:
     ports:
       - 5433:5432
     volumes:
-      - test-replica-data:/data
+      - ../pgdata-replica:/data
       - ../certs:/etc/letsencrypt
     networks:
       - pg_test_network

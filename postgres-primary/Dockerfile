@@ -1,4 +1,4 @@
-FROM postgres:alpine
+FROM postgis/postgis:18-3.6-alpine
 
 RUN apk add --no-cache gosu
 RUN apk add --no-cache aws-cli openssl

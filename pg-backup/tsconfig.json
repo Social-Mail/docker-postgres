@@ -4,6 +4,7 @@
         "target": "es2022",
         "module":"nodenext",
         "rootDir": "./src",
+        "strict": false,
         "moduleResolution": "nodenext",
         "incremental": true,
         "sourceMap": true,
