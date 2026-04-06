@@ -35,40 +35,40 @@ services:
     networks:
       - pg_test_network
 
-  primary-postgres-backup:
-    container_name: test-primary-postgres-backup
-    restart: always
-    build:
-      context: ../../pg-backup
-    env_file:
-      - ../var.env
-    depends_on:
-      - primary-postgres
-    environment:
-      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1
-    #  - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
-    volumes:
-      - test-db-socket:/var/run/postgresql
-      - ../backups:/cache
-    networks:
-      - pg_test_network
+  # primary-postgres-backup:
+  #   container_name: test-primary-postgres-backup
+  #   restart: always
+  #   build:
+  #     context: ../../pg-backup
+  #   env_file:
+  #     - ../var.env
+  #   depends_on:
+  #     - primary-postgres
+  #   environment:
+  #     - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1
+  #   #  - PG_BACKUP_STORAGE_S3_ENDPOINT=http://s3mock:9090
+  #   volumes:
+  #     - test-db-socket:/var/run/postgresql
+  #     - ../backups:/cache
+  #   networks:
+  #     - pg_test_network
 
-  postgres-replica:
-    container_name: test-pg-replica
-    build: ../../postgres-primary
-    environment:
-      - PGDATA=/data
-      - PG_MODE=replica
-      - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1-replica
-    env_file:
-      - ../var.env
-    ports:
-      - 5433:5432
-    volumes:
-      - test-replica-data:/data
-      - ../certs:/etc/letsencrypt
-    networks:
-      - pg_test_network
+  # postgres-replica:
+  #   container_name: test-pg-replica
+  #   build: ../../postgres-primary
+  #   environment:
+  #     - PGDATA=/data
+  #     - PG_MODE=replica
+  #     - PG_BACKUP_STORAGE_S3_BACKUP_FOLDER=test-pg-1-replica
+  #   env_file:
+  #     - ../var.env
+  #   ports:
+  #     - 5433:5432
+  #   volumes:
+  #     - test-replica-data:/data
+  #     - ../certs:/etc/letsencrypt
+  #   networks:
+  #     - pg_test_network
 
   certbot:
     container_name: test-pg-cert-bot
