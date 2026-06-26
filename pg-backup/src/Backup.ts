@@ -54,6 +54,13 @@ export class Backup {
         }
     }
 
+    async newTempFolder() {
+        const tempBackupFolder = `/${globalEnv.folders.pgBackup}/pg-backup-${Date.now()}`;
+
+        await mkdir(tempBackupFolder, { recursive: true });
+        return tempBackupFolder;
+    }
+
     async takeBackup(folder: string, diff = false) {
 
         const type = diff ? "diff" : "full";
@@ -64,9 +71,7 @@ export class Backup {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            const tempBackupFolder = `/${globalEnv.folders.pgBackup}/pg-backup-${Date.now()}`;
-
-            await mkdir(tempBackupFolder, { recursive: true });
+            let tempBackupFolder = await this.newTempFolder();
 
             const latest = await this.storage.getConfig();
 
@@ -81,7 +86,7 @@ export class Backup {
                     "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
-                    "-F", "t",
+                    // "-F", "t",
                     "-s", "1"];
 
             if (diff) {
@@ -135,6 +140,29 @@ export class Backup {
                 }
                 throw new Error(`backup failed ${status} ${all}`);
             }
+
+            const tempBackupFolderTar = await this.newTempFolder();
+
+            // create tar.
+            await spawnPromise("tar",
+                [
+                    "-czf",
+                    `${tempBackupFolder}/pg_wal.tar`,
+                    "-C", `${tempBackupFolderTar}/pg_wal`,
+                    tempBackupFolder
+                ]);
+
+            await spawnPromise("tar",
+                [
+                    "-czf",`${tempBackupFolderTar}/base.tar`,
+                    "--exclude='./pg_wal'",
+                    "-C", tempBackupFolder,
+                    tempBackupFolder
+                ]);
+
+            tempBackupFolder = tempBackupFolderTar;
+
+            await spawnPromise("rm", ["-rf", tempBackupFolder]);
 
             // encrypt every file here...
             console.log(`Encrypting files`);
