@@ -11,7 +11,8 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
 }>((resolve, reject) => {
     const all = [];
     const { logCommand = true, throwOnFail = true, logData = true, logError = true } = options ??= {};
-    options.timeout ??= 5*60*1000;
+    // full one hour timeout
+    options.timeout ??= 60*60*1000;
     const cd = spawn(path, args?.map((x: any) => x instanceof Mask ? x.value : x), options);
     const pid = cd.pid;
 
