@@ -4,19 +4,30 @@ import { SpawnOptionsWithoutStdio, spawn } from "node:child_process";
 import { color } from "console-log-colors";
 import Mask from "./mask.js";
 
-export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOptionsWithoutStdio & { logCommand?: boolean, logData?: boolean, logError?: boolean, throwOnFail?: boolean }) => new Promise<{
+export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOptionsWithoutStdio & { streamLog?: boolean | ((...a: any) => void), logCommand?: boolean, logData?: boolean, logError?: boolean, throwOnFail?: boolean }) => new Promise<{
     get all(): string;
     pid: number;
     status: number;
 }>((resolve, reject) => {
     const all = [];
     const { logCommand = true, throwOnFail = true, logData = true, logError = true } = options ??= {};
+    let { streamLog } = options;
+    if (typeof streamLog === "boolean") {
+        streamLog = streamLog ? console.log : void 0;
+    } else {
+        streamLog = console.log;
+    }
     // full one hour timeout
     const ac = new AbortController();
     const timer = setTimeout(() => {
         ac.abort("timedout");
-    }, 5*60*1000);
+    }, 15*60*1000);
     options.signal = ac.signal;
+
+    if(logCommand || streamLog) {
+        console.log(`${path} ${args.map((x) => x.toString()).map((x) => /\s/.test(x) ? JSON.stringify(x) : x).join(" ")}`);
+    }
+
     const cd = spawn(path, args?.map((x: any) => x instanceof Mask ? x.value : x), options);
     const pid = cd.pid;
 
@@ -33,11 +44,13 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
     cd.stdout.on("data", (data) => {
         timer.refresh();
         data = data.toString("utf-8");
+        streamLog?.(data);
         all.push(data);
     });
     cd.stderr.on("data", (data) => {
         timer.refresh();
         data = data.toString("utf-8");
+        streamLog?.(data);
         all.push(color.red(data));
     });
 
@@ -63,7 +76,6 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
             }
         }
         if (logCommand) {
-            console.log(`${path} ${args.map((x) => x.toString()).map((x) => /\s/.test(x) ? JSON.stringify(x) : x).join(" ")}`);
             if (logData) {
                 console.log(all.join("\n"));
             }
