@@ -108,7 +108,7 @@ export class Backup {
                 args.push("-X", "n");
             }
 
-            const { status } = await spawnPromise(
+            const { status, all } = await spawnPromise(
                 "/usr/bin/pg_basebackup", args , {
                         env: {
                             PGPASSWORD: globalEnv.source.password
@@ -121,7 +121,7 @@ export class Backup {
                 } catch (error) {
                     console.error(error);
                 }
-                throw new Error("backup failed");
+                throw new Error(`backup failed ${status} ${all}`);
             }
 
             // check if manifest was generated...
