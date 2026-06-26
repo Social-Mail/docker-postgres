@@ -12,7 +12,11 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
     const all = [];
     const { logCommand = true, throwOnFail = true, logData = true, logError = true } = options ??= {};
     // full one hour timeout
-    options.timeout ??= 60*60*1000;
+    const ac = new AbortController();
+    const timer = setTimeout(() => {
+        ac.abort("timedout");
+    }, 5*60*1000);
+    options.signal = ac.signal;
     const cd = spawn(path, args?.map((x: any) => x instanceof Mask ? x.value : x), options);
     const pid = cd.pid;
 
@@ -27,10 +31,12 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
     };
 
     cd.stdout.on("data", (data) => {
+        timer.refresh();
         data = data.toString("utf-8");
         all.push(data);
     });
     cd.stderr.on("data", (data) => {
+        timer.refresh();
         data = data.toString("utf-8");
         all.push(color.red(data));
     });

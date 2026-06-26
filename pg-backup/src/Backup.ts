@@ -80,6 +80,7 @@ export class Backup {
                     "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
+                    "-P",
                     "-F", "t",
                     "-s", "1"];
 
