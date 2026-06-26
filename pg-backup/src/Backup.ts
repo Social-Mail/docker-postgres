@@ -131,7 +131,7 @@ export class Backup {
                 } catch (error) {
                     console.error(error);
                 }
-                throw new Error("backup failed");
+                throw new Error(`backup failed ${status} ${all}`);
             }
 
             // encrypt every file here...
