@@ -77,7 +77,6 @@ export class Backup {
 
             const args = [
                     "-h", "/var/run/postgresql",
-                    "-X", "fetch",
                     `--target=${tempBackupFolder}`,
                     -"D", tempBackupFolder,
                     "-U", globalEnv.source.user,
@@ -102,6 +101,7 @@ export class Backup {
                     }
                 }
                 args.push("-i", manifest );
+                args.push("-X", "n");
             } else {
                 args.push("-R");
 
