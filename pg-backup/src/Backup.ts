@@ -78,7 +78,7 @@ export class Backup {
             const args = [
                     "-h", "/var/run/postgresql",
                     `--target=${tempBackupFolder}`,
-                    -"D", tempBackupFolder,
+                    "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
                     "-F", "t",
