@@ -28,6 +28,7 @@ export const globalEnv = {
     },
     folders: {
         backup: process.env.PG_BACKUP_FOLDER || "/cache",
+        pgBackup: process.env.PG_BACKUP_PG_FOLDER || "/pg-backup-root",
         restore: process.env.PG_RESTORE || "/cache/restore",
         get data() {
             return forceEnv("PGDATA");

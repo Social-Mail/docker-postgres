@@ -17,7 +17,7 @@ RUN apk add --no-cache tini
 RUN apk add --no-cache postgresql18-client@edge openssl
 
 WORKDIR /app
-VOLUME [ "/cache" ]
+VOLUME [ "/cache", "/pg-backup-root" ]
 
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules

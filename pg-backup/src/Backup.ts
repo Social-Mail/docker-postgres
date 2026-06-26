@@ -64,7 +64,7 @@ export class Backup {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            const tempBackupFolder = "/tmp/pg-backup-" + Date.now();
+            const tempBackupFolder = `/${globalEnv.folders.pgBackup}/pg-backup-${Date.now()}`;
 
             await mkdir(tempBackupFolder, { recursive: true });
 
@@ -76,7 +76,7 @@ export class Backup {
             console.log(`Taking ${type} backup at ${tempBackupFolder}`);
 
             const args = [
-                    "-h", globalEnv.source.socket ,
+                    "-C",
                     "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",

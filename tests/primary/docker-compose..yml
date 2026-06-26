@@ -15,6 +15,7 @@ services:
       - test-db-socket:/var/run/postgresql
       - ../pgdata:/var/pgdata
       - ../certs:/etc/letsencrypt
+      - ../pg-backup-root:/pg-backup-root
     ports:
       - 5432:5432
     networks:
@@ -50,6 +51,7 @@ services:
     volumes:
       - test-db-socket:/var/run/postgresql
       - ../backups:/cache
+      - ../pg-backup-root:/pg-backup-root
     networks:
       - pg_test_network
 
