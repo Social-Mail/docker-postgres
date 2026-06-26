@@ -54,13 +54,6 @@ export class Backup {
         }
     }
 
-    async newTempFolder() {
-        const tempBackupFolder = `/${globalEnv.folders.pgBackup}/pg-backup-${Date.now()}`;
-
-        await mkdir(tempBackupFolder, { recursive: true });
-        return tempBackupFolder;
-    }
-
     async takeBackup(folder: string, diff = false) {
 
         const type = diff ? "diff" : "full";
@@ -71,7 +64,9 @@ export class Backup {
         if (!existsSync(fullBackupName)) {
             // lets us create a backup...
 
-            let tempBackupFolder = await this.newTempFolder();
+            const tempBackupFolder = "/tmp/pg-backup-" + Date.now();
+
+            await mkdir(tempBackupFolder, { recursive: true });
 
             const latest = await this.storage.getConfig();
 
@@ -81,12 +76,11 @@ export class Backup {
             console.log(`Taking ${type} backup at ${tempBackupFolder}`);
 
             const args = [
-                    "-h", "/var/run/postgresql",
-                    `--target=${tempBackupFolder}`,
-                    // "-D", tempBackupFolder,
+                    "-h", globalEnv.source.socket ,
+                    "-D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
-                    // "-F", "t",
+                    "-F", "t",
                     "-s", "1"];
 
             if (diff) {
@@ -106,9 +100,8 @@ export class Backup {
                     }
                 }
                 args.push("-i", manifest );
-                args.push("-X", "n");
             } else {
-                // args.push("-R");
+                args.push("-R");
 
                 // as we are going to run differential backup
                 // immediately, there is no need to stream and hold the backup process
@@ -140,29 +133,6 @@ export class Backup {
                 }
                 throw new Error(`backup failed ${status} ${all}`);
             }
-
-            const tempBackupFolderTar = await this.newTempFolder();
-
-            // create tar.
-            await spawnPromise("tar",
-                [
-                    "-czf",
-                    `${tempBackupFolder}/pg_wal.tar`,
-                    "-C", `${tempBackupFolderTar}/pg_wal`,
-                    tempBackupFolder
-                ]);
-
-            await spawnPromise("tar",
-                [
-                    "-czf",`${tempBackupFolderTar}/base.tar`,
-                    "--exclude='./pg_wal'",
-                    "-C", tempBackupFolder,
-                    tempBackupFolder
-                ]);
-
-            tempBackupFolder = tempBackupFolderTar;
-
-            await spawnPromise("rm", ["-rf", tempBackupFolder]);
 
             // encrypt every file here...
             console.log(`Encrypting files`);
