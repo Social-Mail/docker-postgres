@@ -76,8 +76,10 @@ export class Backup {
             console.log(`Taking ${type} backup at ${tempBackupFolder}`);
 
             const args = [
-                    "-C",
-                    "-D", tempBackupFolder,
+                    "-h", "/var/run/postgresql",
+                    "-X", "fetch",
+                    `--target=${tempBackupFolder}`,
+                    -"D", tempBackupFolder,
                     "-U", globalEnv.source.user,
                     "-w",
                     "-F", "t",
