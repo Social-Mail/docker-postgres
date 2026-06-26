@@ -42,6 +42,7 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
     });
 
     cd.on("error", (error) => {
+        timer.close();
         const errorText = color.red(error.stack ?? error.toString());
         all.push(error.stack ?? error.toString());
         if (logData || logError) {
@@ -50,6 +51,7 @@ export const spawnPromise = (path, args?: (string | Mask)[], options?: SpawnOpti
         reject(error);
     });
     cd.on("close", (status) => {
+        timer.close();
         if (status>0) {
             if (logError) {
                 console.error(all);
