@@ -17,6 +17,7 @@ COPY ./wal-send.sh ./
 RUN chmod +x ./entrypoint.sh
 RUN chmod +x ./wal-send.sh
 RUN chmod +x ./wal-fetch.sh
+RUN chmod +x ./wal-clean.sh
 RUN chmod +x /docker-entrypoint-initdb.d/create-user.sh
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]
